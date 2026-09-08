@@ -1,17 +1,20 @@
 # Agent Artifact Protocol (AAP)
 
-**Version:** 0.1.0-draft  
-**Status:** experimental specification seed  
-**License:** MIT
+**Version:** 0.1.1-draft  
+**Status:** experimental **filesystem convention** with JSON Schemas (not a full interoperability standard yet)  
+**License:** MIT  
+**Git tag form:** `v0.1.1-draft` (documents omit the `v` prefix)
 
 > **AAP makes repository context addressable without requiring repository context to be loaded.**
 
 AAP is a **runtime-agnostic filesystem convention** for:
 
-1. **Repository orientation** — a tiny map: intent → zone → path  
+1. **Repository orientation** — a tiny map using **layout categories** → zone → directory root  
 2. **Optional durable memory** — typed Markdown (or profile-defined) artifacts with a small envelope  
 
-It is **not** a context engine, RAG stack, agent harness, or mandatory preload pack.
+It is **not** a context engine, RAG stack, agent harness, security sandbox, or mandatory preload pack.
+
+In v0.1, an “intent” is a **small vocabulary key** such as `code`, `tests`, `artifacts`, or `scratch` — **not** a natural-language task classifier. AAP does not understand phrases like “modernize the API” by itself; the agent (or human) picks a layout key and looks under that root.
 
 Philosophy (aligned with formats like [Memoryfield](https://github.com/calpaterson/memoryfield-spec)):
 
@@ -49,34 +52,31 @@ Optional later: copy [`schemas/`](./schemas/) into the consumer (version-pin) fo
 
 ```bash
 # conceptual pin (no runtime fetch during normal agent sessions)
-# git clone --depth 1 --branch v0.1.0-draft \
+# git clone --depth 1 --branch v0.1.1-draft \
 #   https://github.com/gitpash/agent-artifact-protocol.git /tmp/aap
-# cp /tmp/aap/templates/minimal-map.yaml .aap/map.yaml
+# mkdir -p .aap && cp /tmp/aap/templates/minimal-map.yaml .aap/map.yaml
 ```
 
-Init tooling, if added later, MUST be **explicit**, **additive**, **dry-run capable**, and **human-reviewed**. It MUST NOT rewrite `CLAUDE.md` / `.specify/` / existing docs homes by default.
+Init tooling, if added later, MUST be **explicit**, **additive**, **dry-run capable**, and **human-reviewed**. It MUST NOT rewrite `CLAUDE.md` / `.specify/` / existing docs homes by default. **If a target file already exists, init MUST stop or require explicit per-file confirmation** — never silent overwrite.
 
 ---
 
 ## Repository layout (this seed)
 
 ```text
-README.md                 # you are here
+README.md
 SPEC.md                   # normative Core (on demand — not L0)
-WHITE-PAPER.md            # thesis and positioning
+WHITE-PAPER.md
+CONTRIBUTING.md
 LICENSE
 CHANGELOG.md
-schemas/                  # map + artifact envelope JSON Schema
+schemas/
 templates/
-  minimal-map.yaml        # L0 starter
-  artifact-capability.md
-  artifact-decision.md
 examples/
-  single-repo/map.yaml
-  multi-zone/map.yaml
+  single-repo/ multi-zone/ invalid/
 cookbook/
-  brownfield-init.md
-  what-not-to-copy.md
+scripts/validate.py
+.github/workflows/validate.yml
 ```
 
 **Not in this seed (on purpose):** product adoption guides, pilot metrics, partner-repo contracts, agent runtime adapters, CLI.
@@ -87,17 +87,28 @@ cookbook/
 
 | Term | Meaning |
 |------|---------|
-| **Map** | Sparse registry of zones + layout intents |
+| **Map** | Sparse registry of zones + **layout** category roots |
 | **Zone** | Named **placement/coordination** scope (not automatic team ownership) |
-| **Layout** | Intent → directory root(s) (`code`, `tests`, `artifacts`, `scratch`, …) |
+| **Layout key** | `code`, `tests`, `artifacts`, `scratch`, … → directory root(s) |
 | **Artifact** | Durable note with envelope fields (`id`, `type`, `zone`, `status`, `updated`, …) |
-| **Write** | Allow-list of mutating modes: `domain`, `architect` (may be `[]`) |
+| **Write** | Coordination **hint**: allow-list of mutating modes `domain` \| `architect` (may be `[]`) |
 | **Access** | Optional `read-only` / `read-write` |
 
-Core artifact `type` values: `capability` | `decision` | `contract` | `gotcha` | `impact`  
-Extension types use dots: `diagram.sequence`, …
+### `write` is not security
 
-External / cross-repo zones (`relation: external`) are a **provisional** schema-compatible extension — not required to claim Core orientation.
+```yaml
+# Coordination hint only — NOT access control / sandboxing.
+write: [domain, architect]
+```
+
+AAP **cannot** prevent a human or agent from writing outside these paths. Real enforcement requires Git permissions, CODEOWNERS, host policy, or a runtime sandbox.
+
+If no active mutating mode is **explicitly** provided by the user/runtime, the default is **no write grant** (read/orient only).
+
+Core artifact `type` values: `capability` | `decision` | `contract` | `gotcha` | `impact`  
+Extension types SHOULD use dots (`diagram.sequence`). The Core JSON Schema validates **envelope shape**; it does not fully police extension namespaces (repository validators MAY).
+
+External / cross-repo zones (`relation: external`) are a **provisional** schema-compatible extension — not required for Core orientation.
 
 Full rules: [`SPEC.md`](./SPEC.md).
 
@@ -107,11 +118,16 @@ Full rules: [`SPEC.md`](./SPEC.md).
 
 | Label | Means |
 |-------|--------|
-| **Orientation** | A discoverable sparse map exists; agents may use intent routing |
+| **Orientation** | A discoverable sparse map exists; agents may use layout-based discovery |
 | **Artifact** | Durable notes use the envelope field set when claiming AAP addressability |
 | **Topology** | Multi-root workspace map lists zones with honest paths |
 
-Validation with JSON Schema is optional (L1+). Missing schema must not block L0.
+This draft is a **convention + schemas**, not a complete cross-file protocol suite. Schema does not yet prove zone membership of every path, unique ids across a corpus, etc.
+
+```bash
+pip install pyyaml jsonschema
+python scripts/validate.py
+```
 
 ---
 
@@ -140,6 +156,13 @@ If B does not improve time-to-locus / wrong-home rate, **shrink** the map — do
 
 ## Status
 
-`0.1.0-draft` — usable as a blueprint; expect breaking refinements until `0.1.0` or `1.0.0`.
+`0.1.1-draft` — experimental blueprint. **Not** production infrastructure or a finished interoperability standard.
 
-Issues and PRs welcome. Prefer proposals that keep L0 small.
+Feedback is especially welcome on:
+
+- map size and usefulness in brownfield repos  
+- whether layout keys are the right granularity  
+- interoperability across agent runtimes without preload  
+- whether Core is still too large  
+
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md). Issues and PRs welcome; prefer proposals that keep L0 small.

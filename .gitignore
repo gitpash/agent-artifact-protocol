@@ -5,3 +5,4 @@
 map.local.yaml
 .aap/map.local.yaml
 docs/map.local.yaml
+.venv/

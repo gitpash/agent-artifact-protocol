@@ -1,0 +1,49 @@
+# Contributing to AAP
+
+Thank you for helping keep the Core **small**.
+
+## Version strings
+
+| Place | Form |
+|-------|------|
+| Documents / CHANGELOG | `0.1.1-draft` (no `v`) |
+| Git tags | `v0.1.1-draft` (with `v`) |
+
+## What belongs in Core vs elsewhere
+
+| In Core (expensive) | Profile / cookbook / later |
+|---------------------|----------------------------|
+| Map discovery + layout intents | Natural-language task routing |
+| Envelope field set + core types | New core types without evidence |
+| Progressive disclosure rules | Runtime adapters (Claude, CI bots) |
+| `write` / `access` as **hints** | Real ACL / auth systems |
+| Schema shape validation | Cross-file linters beyond seed |
+
+## Proposing a Core change
+
+Open an issue or PR that includes:
+
+1. **Problem** (who hurts today)  
+2. **Why not cookbook/profile only**  
+3. **L0 impact** — does the mandatory first-read surface grow?  
+4. **Maintenance cost**  
+5. **Migration / rollback**  
+6. **Schema or example diff**  
+7. At least one **invalid** case if adding a restriction  
+
+## L0 budget
+
+If your change requires agents to read more than the local map at session start, it is probably wrong for Core.
+
+## Validation
+
+```bash
+pip install pyyaml jsonschema
+python scripts/validate.py
+```
+
+CI runs the same script on PRs.
+
+## Security of `write`
+
+PRs must not describe `write` as authentication or sandboxing. Host Git permissions and runtime policy enforce real boundaries.

@@ -1,0 +1,6 @@
+version: 1
+zones:
+  partner:
+    relation: external
+    write: []
+    access: read-only

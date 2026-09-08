@@ -1,6 +1,6 @@
 # AAP White Paper (outline)
 
-**Status:** outline paired with SPEC 0.1.0-draft  
+**Status:** outline paired with SPEC 0.1.1-draft  
 
 ---
 
@@ -14,7 +14,7 @@ Training priors invent paths (`.claude/spec`, random `docs/`, `.specify/`). Team
 
 > Make repository context **addressable** without requiring repository context to be **loaded**.
 
-- **Map** = semantic addresses (intent → zone → path)  
+- **Map** = layout-category addresses (e.g. `code` → zone → directory root)  
 - **Artifacts** = optional durable depth  
 - **Retrieval** = existing tools (`grep`, LSP, indexes, MCP, …)  
 - **Not** a proprietary context engine  

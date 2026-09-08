@@ -1,0 +1,5 @@
+version: 1
+zones:
+  app:
+    kind: mixed
+    write: [domain]

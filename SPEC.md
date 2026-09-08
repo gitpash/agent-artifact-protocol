@@ -1,7 +1,9 @@
 # AAP Core Specification
 
-**Protocol:** Agent Artifact Protocol (AAP)  
-**Version:** 0.1.0-draft  
+**Name:** Agent Artifact Protocol (AAP)  
+**Kind:** Filesystem **convention** + JSON Schemas (draft; not a complete interop test suite)  
+**Version:** 0.1.1-draft  
+**Git tag:** `v0.1.1-draft`  
 **Status:** Draft  
 **Keywords:** MUST / MUST NOT / SHOULD / MAY as in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119)
 
@@ -15,12 +17,14 @@ AAP is a **runtime-agnostic filesystem convention** for repository orientation a
 
 It standardizes:
 
-1. **Thin topology (map)** — zones + intent→path addresses  
+1. **Thin topology (map)** — zones + **layout-category** → directory root addresses  
 2. **Artifacts** — typed envelope-addressable units when memory must persist  
 3. **Duty classes** — scratch vs durable maintain expectations  
 4. **Light conformance** — orientation / artifact / topology labels  
 
-It does **not** standardize retrieval engines, agent orchestration, embeddings, IDE hooks, or task trackers.
+It does **not** standardize retrieval engines, agent orchestration, embeddings, IDE hooks, task trackers, or OS/Git access control.
+
+In v0.1, layout “intents” are **fixed vocabulary keys** (`code`, `tests`, `artifacts`, `scratch`, …), not natural-language task routing.
 
 **Philosophy:** conventions over infrastructure; discovery over preloading; progressive disclosure over context dumping; files over runtime dependencies.
 
@@ -44,6 +48,8 @@ It does **not** standardize retrieval engines, agent orchestration, embeddings, 
 - Not mandatory embeddings or knowledge graphs  
 - Not GitHub-only process binding  
 - Not a mandate to preload SPEC, schemas, or artifact corpora at session start  
+- Not a security boundary: `write` / `access` do **not** authenticate or sandbox agents  
+- Not a natural-language intent classifier
 
 ### 1.3 Progressive disclosure (normative)
 
@@ -73,8 +79,8 @@ Producers SHOULD keep maps sparse. Essays belong in L1/L2, not the map.
 | **Workspace** | Tree where the agent operates |
 | **Map** | Registry of zones (+ optional defaults, overlays, profiles list) |
 | **Zone** | Named **placement and coordination** scope; ownership is optional and not implied |
-| **Layout** | Intent → directory root(s) relative to resolved zone root |
-| **Intent** | Why read/write: `code`, `tests`, `artifacts`, `scratch`, … |
+| **Layout** | Layout-category key → directory root(s) relative to resolved zone root |
+| **Layout key (v0.1 “intent”)** | Vocabulary token: `code`, `tests`, `artifacts`, `scratch`, … — not free-text tasks |
 | **Artifact** | Durable unit with Core envelope + body |
 | **Envelope** | Portable metadata (YAML frontmatter or sidecar) |
 | **Derived** | Regenerable views (HTML, vectors, graphs) — not canonical SoT |
@@ -114,26 +120,35 @@ profiles:
 - **version:** MUST be `1` for this draft.  
 - **Zone ids:** SHOULD match `^[a-z][a-z0-9-]*$`.  
 - **path:** Relative to workspace root; `.` for repo root.  
-- **write:** Mutating allow-list. Empty = no declared write grant.  
+- **write:** Mutating allow-list (`domain` \| `architect`). Empty = no declared write grant. **Not authentication.**  
 - **access:** Optional. Prefer `access: read-only` with `write: []` for consume-only zones.  
+
+#### Active mutating mode (runtime input)
+
+- The **active mode** is supplied by the human or host adapter (e.g. user said “implement in this service” → `domain`).  
+- It is **not** an authenticated identity and MUST NOT be inferred solely from file presence.  
+- **If no active mutating mode is explicitly provided, the default is no write grant** (orientation/read only).  
+- Adapters MAY map UI roles to `domain` / `architect`; Core does not define SSO or permissions.  
+- AAP **cannot** stop writes outside layout roots; Git permissions, CODEOWNERS, and sandboxes do.
 
 Machine-local overlays SHOULD use `map.local.yaml` / `docs/map.local.yaml` / `.aap/map.local.yaml` (gitignored). Absolute paths MUST NOT be required for CI.
 
 JSON Schema: [`schemas/map.schema.json`](./schemas/map.schema.json).
 
-### 3.3 Layout intents
+### 3.3 Layout keys (directory categories)
 
-Layout MUST NOT inventory individual source files.
+Layout MUST NOT inventory individual source files.  
+This is **layout-based discovery**, not natural-language intent routing.
 
-**Core intents:** `code`, `tests`, `artifacts`, `scratch`  
+**Core keys:** `code`, `tests`, `artifacts`, `scratch`  
 **Standard optional:** `scripts`, `infra`, `proposals`, `architecture`  
 **Extension:** any other key → path or path list  
 
 Paths: relative to resolved zone root; `/` separators; MUST NOT contain `..`; SHOULD NOT be absolute.
 
 **Merge:** zone `layout` overrides `defaults.layout` key-wise (replace).  
-**Write target:** first listed root for an intent unless specified.  
-**Missing intent:** MUST NOT invent a parallel conventional root for an intent that already exists; ask or fail closed for that write.
+**Write target:** first listed root for a key unless specified.  
+**Missing key:** MUST NOT invent a parallel conventional root for a key that already exists; ask or fail closed for that write.
 
 ### 3.4 Resolved root
 
@@ -171,9 +186,13 @@ Use for partner checkouts without git submodules. Details may graduate via a fut
 | `status` | `draft` \| `active` \| `deprecated` |
 | `updated` | `YYYY-MM-DD` |
 
+**`updated` semantics:** date when artifact **content or envelope was last materially changed**. It is **not** a verification timestamp (a future `last_verified` MAY be added; not required in 0.1). Typo-only fixes MAY leave `updated` unchanged; meaning changes SHOULD bump it. Timezone: calendar date as agreed by the team (UTC date RECOMMENDED for distributed teams).
+
 Recommended: `title`, `summary`, `stability`, `maintain`, `owner`, `refs`, `supersedes` / `superseded_by`.
 
 JSON Schema: [`schemas/artifact-envelope.schema.json`](./schemas/artifact-envelope.schema.json).
+
+**Schema posture (permissive Core):** the Core envelope schema validates **shape** of common fields. It does **not** require `type` to be only the five Core values (extensions allowed). It does **not** fully enforce dotted extension syntax. Profiles or repo linters MAY tighten `type` patterns. Cross-file rules (zone exists, unique ids, path under zone root) are **out of Core schema scope** in 0.1.
 
 ### 4.2 Core types
 
@@ -185,7 +204,7 @@ JSON Schema: [`schemas/artifact-envelope.schema.json`](./schemas/artifact-envelo
 | `gotcha` | Costly rediscovery hazard |
 | `impact` | Change blast sketch (often short-lived) |
 
-Extension types MUST use a dot (`diagram.sequence`, …). Readers MUST parse Core fields even if `type` is unknown.
+Extension types SHOULD use a dot (`diagram.sequence`, …). Readers MUST parse Core fields even if `type` is unknown.
 
 ### 4.3 Body
 
@@ -223,22 +242,25 @@ Opaque strings. URI-like forms RECOMMENDED (`gh:owner/repo#1`, `id:other`, `path
 ```text
 1. Discover map only
 2. Merge local overlays if present
-3. Choose zone + intent from task
+3. Choose zone + layout key from task (human/agent judgment — not NL classifier in Core)
 4. Targeted retrieve under layout roots (grep/LSP/index/…)
 5. Open specific artifacts only if needed
-6. Open SPEC only when editing/validating protocol structure
+6. Open SPEC only when editing/validating convention structure
 ```
 
 ### 5.2 Write
 
 ```text
 1. Orient via map
-2. Check write allow-list for active mutating mode
-3. Resolve layout intent path
-4. Do not invent parallel roots
-5. Write envelope + body
-6. Cross-zone conflict → BLOCKED with reason (not silent foreign edits)
+2. Determine active mutating mode from explicit user/runtime input (default: none)
+3. If mode absent or not in zone.write → do not claim write grant; ask or stay read-only
+4. Resolve layout key path
+5. Do not invent parallel roots
+6. Write envelope + body
+7. Cross-zone conflict → BLOCKED with reason (not silent foreign edits)
 ```
+
+Remember: even a declared grant is a **hint**; hosts enforce real filesystem policy.
 
 ---
 

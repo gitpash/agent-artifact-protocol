@@ -1,0 +1,7 @@
+version: 1
+zones:
+  app:
+    path: .
+    write: [domain]
+    layout:
+      code: /abs/src/

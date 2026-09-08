@@ -121,7 +121,7 @@ profiles:
 - **Zone ids:** SHOULD match `^[a-z][a-z0-9-]*$`.  
 - **path:** Relative to workspace root; `.` for repo root.  
 - **write:** Mutating allow-list (`domain` \| `architect`). Empty = no declared write grant. **Not authentication.**  
-- **access:** Optional. Prefer `access: read-only` with `write: []` for consume-only zones.  
+- **access:** Optional descriptive state: `read-only` or `read-write`; it does not grant authorization. Prefer `access: read-only` with `write: []` for consume-only zones. `write` controls declared mutating modes; an empty list means no mode may claim a write grant, regardless of `access`.
 
 #### Active mutating mode (runtime input)
 

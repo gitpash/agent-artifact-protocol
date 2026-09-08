@@ -131,7 +131,7 @@ def main() -> None:
                 die(f"expected invalid fixture to fail but passed: {path}")
             print(f"OK invalid fixture rejected {path.relative_to(ROOT)}")
 
-    for path in sorted((ROOT / "templates").glob("artifact-*.md")):
+    def parse_envelope(path: Path) -> dict:
         text = path.read_text(encoding="utf-8")
         if not text.startswith("---"):
             die(f"{path}: missing frontmatter")
@@ -139,15 +139,32 @@ def main() -> None:
         if len(parts) < 3:
             die(f"{path}: malformed frontmatter")
         meta = yaml.safe_load(parts[1])
+        if not isinstance(meta, dict):
+            die(f"{path}: frontmatter must be a mapping")
         # YAML 1.1 may load bare dates as datetime.date — normalize for schema.
-        if isinstance(meta, dict) and hasattr(meta.get("updated"), "isoformat"):
+        if hasattr(meta.get("updated"), "isoformat"):
             meta["updated"] = meta["updated"].isoformat()
+        return meta
+
+    for path in sorted((ROOT / "templates").glob("artifact-*.md")):
+        meta = parse_envelope(path)
         env_errs = list(env_validator.iter_errors(meta))
         if env_errs:
             for e in env_errs:
                 print(f"  {path}: {e.message}", file=sys.stderr)
             die(f"envelope invalid {path}")
         print(f"OK envelope {path.relative_to(ROOT)}")
+
+    invalid_artifacts = sorted((ROOT / "examples" / "invalid").glob("artifact-*.md"))
+    for path in invalid_artifacts:
+        try:
+            meta = parse_envelope(path)
+        except SystemExit:
+            print(f"OK invalid artifact rejected {path.relative_to(ROOT)}")
+            continue
+        if not list(env_validator.iter_errors(meta)):
+            die(f"expected invalid artifact to fail but passed: {path}")
+        print(f"OK invalid artifact rejected {path.relative_to(ROOT)}")
 
     for path in (ROOT / "examples").rglob("*.yaml"):
         if "invalid" in path.parts:

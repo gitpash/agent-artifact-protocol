@@ -14,7 +14,7 @@ Add AAP orientation to an existing repo **without** rewriting its docs system.
    Record tag/commit in a one-line note, e.g. `.aap/VERSION`:
 
    ```text
-   v0.1.0-draft
+   v0.1.1-draft
    https://github.com/gitpash/agent-artifact-protocol
    ```
 

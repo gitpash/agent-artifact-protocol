@@ -1,4 +1,4 @@
-# Invalid map fixtures
+# Invalid fixtures
 
 These files **must fail** `scripts/validate.py`. They document Core rejection cases.
 
@@ -9,5 +9,8 @@ These files **must fail** `scripts/validate.py`. They document Core rejection ca
 | `layout-absolute-path.yaml` | Layout path is absolute |
 | `layout-dotdot.yaml` | Layout path contains `..` |
 | `write-readonly.yaml` | `readonly` is not a write grant |
+| `artifact-missing-id.md` | Required envelope field `id` is missing |
+
+These fixtures cover schema-level rejection only; cross-file rules remain outside the seed validator.
 
 Do not copy these into real projects.

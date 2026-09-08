@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/gitpash/agent-artifact-protocol/v0.1.0-draft/schemas/artifact-envelope.schema.json",
+  "title": "AAP Artifact Envelope v0.1",
+  "type": "object",
+  "required": ["id", "type", "zone", "status", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9./-]*[a-z0-9]$|^[a-z0-9]$",
+      "description": "Stable artifact id. Immutable for the identity lifetime."
+    },
+    "type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Core type or dotted extension type (e.g. diagram.sequence)."
+    },
+    "zone": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Zone id from map, or default in single-zone workspaces."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "deprecated"]
+    },
+    "updated": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "YYYY-MM-DD"
+    },
+    "title": { "type": "string" },
+    "summary": { "type": "string" },
+    "stability": {
+      "type": "string",
+      "enum": ["scratch", "experimental", "durable"]
+    },
+    "maintain": {
+      "type": "string",
+      "enum": ["nobody", "owner", "zone", "core"]
+    },
+    "owner": { "type": "string" },
+    "refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "supersedes": { "type": "string" },
+    "superseded_by": { "type": "string" },
+    "canonical_path": {
+      "type": "string",
+      "description": "For sidecars: relative path to non-Markdown canonical body."
+    },
+    "body_format": {
+      "type": "string",
+      "description": "Profile token for non-Markdown body shape."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "type": { "enum": ["capability", "decision", "contract", "gotcha", "impact"] } }
+      },
+      "then": {
+        "properties": {
+          "type": {
+            "enum": ["capability", "decision", "contract", "gotcha", "impact"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "maintain": { "const": "owner" } },
+        "required": ["maintain"]
+      },
+      "then": {
+        "required": ["owner"]
+      }
+    }
+  ],
+  "description": "Core envelope only. Unknown additional properties are allowed for extensions (generic readers ignore them)."
+}

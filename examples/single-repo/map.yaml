@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=../../schemas/map.schema.json
+# Single product repository — topology optional; map still helps orientation.
+version: 1
+
+defaults:
+  layout:
+    artifacts: docs/artifacts/
+    scratch: docs/scratch/
+
+zones:
+  app:
+    path: .
+    kind: mixed
+    write: [domain, architect]
+    layout:
+      code: src/
+      tests: tests/
+      scripts: scripts/
+      artifacts: docs/artifacts/
+      scratch: docs/scratch/

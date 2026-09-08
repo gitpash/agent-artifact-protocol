@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/gitpash/agent-artifact-protocol/v0.1.0-draft/schemas/map.schema.json
+#
+# AAP L0 orientation map — keep this file small.
+# Copy to: .aap/map.yaml  (or map.yaml / docs/map.yaml)
+#
+version: 1
+
+defaults:
+  layout:
+    artifacts: docs/artifacts/
+    scratch: docs/scratch/
+
+zones:
+  # Single-repo default: one zone covering the tree
+  app:
+    path: .
+    kind: mixed
+    write: [domain, architect]
+    layout:
+      code: src/                 # ← change to your code root
+      tests: tests/              # ← change to your test root
+      artifacts: docs/artifacts/
+      scratch: docs/scratch/

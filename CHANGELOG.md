@@ -10,7 +10,10 @@
 - Explicit: layout keys ≠ NL intent router; `write` ≠ security; default mode = no write grant  
 - Init no-overwrite rule in cookbook  
 - `updated` field semantics (material change, not verification)  
-- Core schema posture: envelope shape permissive on extension `type`  
+- Core schema posture: envelope shape permissive on extension `type`
+- Deployment-defined write mode labels; deployment-specific role names are no longer Core vocabulary
+- Clarified `artifacts` layout key and recommended namespace-like artifact ids
+- Renamed `WHITE-PAPER.md` to `MOTIVATION.md`
 
 ### Clarified
 

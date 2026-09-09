@@ -1,4 +1,4 @@
-# AAP White Paper (outline)
+# AAP Motivation (outline)
 
 **Status:** outline paired with SPEC 0.1.1-draft  
 
@@ -80,4 +80,4 @@ Expand schemas/profiles only if B wins on time-to-locus and wrong-home rate.
 > Progressive disclosure over context dumping.  
 > Files over runtime dependencies.
 
-Normative detail: [`SPEC.md`](./SPEC.md).
+Normative detail: [`SPEC.md`](./SPEC.md). This document explains motivation and positioning; it is not an evidence-backed white paper or normative specification.

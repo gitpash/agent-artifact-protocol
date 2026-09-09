@@ -155,9 +155,9 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["domain", "architect"]
+            "minLength": 1
           },
-          "description": "Mutating mode allow-list (domain|architect). Empty array = no write grant. Use access: read-only for consume-only zones."
+          "description": "Deployment-defined mutating mode labels. Empty array = no declared write grant. Core does not define a universal role vocabulary."
         },
         "layout": { "$ref": "#/$defs/layoutObject" }
       },

@@ -17,6 +17,7 @@ Thank you for helping keep the Core **small**.
 | Envelope field set + core types | New core types without evidence |
 | Progressive disclosure rules | Runtime adapters (Claude, CI bots) |
 | `write` / `access` as **hints** | Real ACL / auth systems |
+| Deployment-defined mode labels | Universal role vocabulary |
 | Schema shape validation | Cross-file linters beyond seed |
 
 ## Proposing a Core change
@@ -46,4 +47,4 @@ CI runs the same script on PRs.
 
 ## Security of `write`
 
-PRs must not describe `write` as authentication or sandboxing. Host Git permissions and runtime policy enforce real boundaries.
+PRs must not describe `write` as authentication or sandboxing. Host Git permissions and runtime policy enforce real boundaries. The Core schema accepts deployment-defined non-empty string labels for `write`; adapters may map local roles to them.

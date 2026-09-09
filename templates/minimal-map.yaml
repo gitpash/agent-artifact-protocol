@@ -16,8 +16,9 @@ zones:
   app:
     path: .
     kind: mixed
-    # Coordination hint only — NOT access control / sandboxing.
-    write: [domain, architect]
+    # Deployment-defined coordination labels only — NOT access control / sandboxing.
+    # Replace these example values with labels used by your deployment.
+    write: [maintainer]
     layout:
       code: src/                 # ← change to your code root
       tests: tests/              # ← change to your test root

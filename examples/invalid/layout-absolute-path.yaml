@@ -2,6 +2,6 @@ version: 1
 zones:
   app:
     path: .
-    write: [domain]
+    write: [maintainer]
     layout:
       code: /abs/src/

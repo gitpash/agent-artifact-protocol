@@ -1,5 +1,7 @@
 # AAP Core Specification
 
+This document defines the generic protocol convention. Deployment-specific mode labels, ownership terminology, and enforcement live outside Core.
+
 **Name:** Agent Artifact Protocol (AAP)  
 **Kind:** Filesystem **convention** + JSON Schemas (draft; not a complete interop test suite)  
 **Version:** 0.1.1-draft  
@@ -80,7 +82,7 @@ Producers SHOULD keep maps sparse. Essays belong in L1/L2, not the map.
 | **Map** | Registry of zones (+ optional defaults, overlays, profiles list) |
 | **Zone** | Named **placement and coordination** scope; ownership is optional and not implied |
 | **Layout** | Layout-category key → directory root(s) relative to resolved zone root |
-| **Layout key (v0.1 “intent”)** | Vocabulary token: `code`, `tests`, `artifacts`, `scratch`, … — not free-text tasks |
+| **Layout key (v0.1 “intent”)** | Vocabulary token: `code`, `tests`, `artifacts`, `scratch`, … — not free-text tasks; `artifacts` denotes the AAP-addressable durable-artifact root |
 | **Artifact** | Durable unit with Core envelope + body |
 | **Envelope** | Portable metadata (YAML frontmatter or sidecar) |
 | **Derived** | Regenerable views (HTML, vectors, graphs) — not canonical SoT |
@@ -107,7 +109,7 @@ zones:
   <zone-id>:
     path: <rel path from workspace root>   # required for internal zones
     kind: <string>                         # soft hint
-    write: [domain | architect]            # may be []
+    write: [maintainer]                    # deployment-defined labels; may be []
     access: read-only | read-write         # optional
     layout: { ... }
 overlays:                                  # prefer gitignored map.local.yaml
@@ -120,15 +122,15 @@ profiles:
 - **version:** MUST be `1` for this draft.  
 - **Zone ids:** SHOULD match `^[a-z][a-z0-9-]*$`.  
 - **path:** Relative to workspace root; `.` for repo root.  
-- **write:** Mutating allow-list (`domain` \| `architect`). Empty = no declared write grant. **Not authentication.**  
+- **write:** Deployment-defined mutating mode labels. Empty = no declared write grant. **Not authentication.** Core does not define a universal role vocabulary.
 - **access:** Optional descriptive state: `read-only` or `read-write`; it does not grant authorization. Prefer `access: read-only` with `write: []` for consume-only zones. `write` controls declared mutating modes; an empty list means no mode may claim a write grant, regardless of `access`.
 
 #### Active mutating mode (runtime input)
 
-- The **active mode** is supplied by the human or host adapter (e.g. user said “implement in this service” → `domain`).  
+- The **active mode** is supplied by the human or host adapter (for example, a deployment may use `maintainer` or `reviewer`).
 - It is **not** an authenticated identity and MUST NOT be inferred solely from file presence.  
 - **If no active mutating mode is explicitly provided, the default is no write grant** (orientation/read only).  
-- Adapters MAY map UI roles to `domain` / `architect`; Core does not define SSO or permissions.  
+- Adapters MAY map UI roles to deployment-defined mode labels; Core does not define SSO or permissions.
 - AAP **cannot** stop writes outside layout roots; Git permissions, CODEOWNERS, and sandboxes do.
 
 Machine-local overlays SHOULD use `map.local.yaml` / `docs/map.local.yaml` / `.aap/map.local.yaml` (gitignored). Absolute paths MUST NOT be required for CI.
@@ -140,7 +142,7 @@ JSON Schema: [`schemas/map.schema.json`](./schemas/map.schema.json).
 Layout MUST NOT inventory individual source files.  
 This is **layout-based discovery**, not natural-language intent routing.
 
-**Core keys:** `code`, `tests`, `artifacts`, `scratch`  
+**Core keys:** `code`, `tests`, `artifacts`, `scratch`. The `artifacts` key means the canonical root for AAP-addressable durable artifacts in that zone, not generic build output.
 **Standard optional:** `scripts`, `infra`, `proposals`, `architecture`  
 **Extension:** any other key → path or path list  
 
@@ -189,6 +191,8 @@ Use for partner checkouts without git submodules. Details may graduate via a fut
 **`updated` semantics:** date when artifact **content or envelope was last materially changed**. It is **not** a verification timestamp (a future `last_verified` MAY be added; not required in 0.1). Typo-only fixes MAY leave `updated` unchanged; meaning changes SHOULD bump it. Timezone: calendar date as agreed by the team (UTC date RECOMMENDED for distributed teams).
 
 Recommended: `title`, `summary`, `stability`, `maintain`, `owner`, `refs`, `supersedes` / `superseded_by`.
+
+Producers SHOULD prefer stable namespace-like ids such as `<zone>/<type>/<slug>`. Core does not provide distributed id allocation; uniqueness across an artifact corpus is a tooling concern.
 
 JSON Schema: [`schemas/artifact-envelope.schema.json`](./schemas/artifact-envelope.schema.json).
 
@@ -296,4 +300,4 @@ Optional schema validation is L1+. L0 MUST work without a linter.
 ## 9. Versioning
 
 Breaking Core changes require a version bump and changelog entry.  
-`0.1.0-draft` may still change before `0.1.0`.
+`0.1.1-draft` may still change before `0.1.1`.

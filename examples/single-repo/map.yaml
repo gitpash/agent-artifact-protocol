@@ -11,7 +11,7 @@ zones:
   app:
     path: .
     kind: mixed
-    write: [domain, architect]
+    write: [maintainer]
     layout:
       code: src/
       tests: tests/

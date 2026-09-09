@@ -66,7 +66,7 @@ Init tooling, if added later, MUST be **explicit**, **additive**, **dry-run capa
 ```text
 README.md
 SPEC.md                   # normative Core (on demand — not L0)
-WHITE-PAPER.md
+MOTIVATION.md
 CONTRIBUTING.md
 LICENSE
 CHANGELOG.md
@@ -89,16 +89,16 @@ scripts/validate.py
 |------|---------|
 | **Map** | Sparse registry of zones + **layout** category roots |
 | **Zone** | Named **placement/coordination** scope (not automatic team ownership) |
-| **Layout key** | `code`, `tests`, `artifacts`, `scratch`, … → directory root(s) |
+| **Layout key** | `code`, `tests`, `artifacts`, `scratch`, … → directory root(s); `artifacts` means the AAP-addressable durable-artifact root, not generic build output |
 | **Artifact** | Durable note with envelope fields (`id`, `type`, `zone`, `status`, `updated`, …) |
-| **Write** | Coordination **hint**: allow-list of mutating modes `domain` \| `architect` (may be `[]`) |
+| **Write** | Coordination **hint**: deployment-defined labels for mutating modes (may be `[]`) |
 | **Access** | Optional `read-only` / `read-write` |
 
 ### `write` is not security
 
 ```yaml
 # Coordination hint only — NOT access control / sandboxing.
-write: [domain, architect]
+write: [maintainer]
 ```
 
 AAP **cannot** prevent a human or agent from writing outside these paths. Real enforcement requires Git permissions, CODEOWNERS, host policy, or a runtime sandbox.
@@ -106,6 +106,7 @@ AAP **cannot** prevent a human or agent from writing outside these paths. Real e
 If no active mutating mode is **explicitly** provided by the user/runtime, the default is **no write grant** (read/orient only).
 
 Core artifact `type` values: `capability` | `decision` | `contract` | `gotcha` | `impact`  
+Recommended stable ids use a namespace-like form such as `<zone>/<type>/<slug>`. Id uniqueness across a corpus is a tooling concern, not distributed allocation provided by Core.
 Extension types SHOULD use dots (`diagram.sequence`). The Core JSON Schema validates **envelope shape**; it does not fully police extension namespaces (repository validators MAY).
 
 External / cross-repo zones (`relation: external`) are a **provisional** schema-compatible extension — not required for Core orientation.

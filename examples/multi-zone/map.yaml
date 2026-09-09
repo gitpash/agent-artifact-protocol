@@ -11,7 +11,7 @@ zones:
   global:
     path: .
     kind: root
-    write: [architect]
+    write: [platform-maintainer]
     layout:
       artifacts: docs/artifacts/global/
       scratch: docs/scratch/
@@ -19,7 +19,7 @@ zones:
   backend:
     path: services/backend
     kind: backend
-    write: [domain]
+    write: [service-maintainer]
     layout:
       code: src/
       tests: tests/
@@ -29,7 +29,7 @@ zones:
   frontend:
     path: apps/web
     kind: frontend
-    write: [domain]
+    write: [service-maintainer]
     layout:
       code: src/
       tests: src/

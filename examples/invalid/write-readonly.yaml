@@ -2,4 +2,4 @@ version: 1
 zones:
   app:
     path: .
-    write: [readonly]
+    write: [""]

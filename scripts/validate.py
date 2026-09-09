@@ -64,11 +64,8 @@ def layout_path_errors(data: dict) -> list[str]:
                 errs.append(f"zones.{zid}.write must be list")
             else:
                 for mode in write:
-                    if mode not in ("domain", "architect"):
-                        errs.append(
-                            f"zones.{zid}.write invalid mode {mode!r} "
-                            "(readonly is not a write grant; use access: read-only and write: [])"
-                        )
+                    if not isinstance(mode, str) or not mode.strip():
+                        errs.append(f"zones.{zid}.write entries must be non-empty strings")
     return errs
 
 

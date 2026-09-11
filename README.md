@@ -1,11 +1,13 @@
 # Agent Artifact Protocol (AAP)
 
 **Version:** 0.1.1-draft  
-**Status:** experimental **filesystem convention** with JSON Schemas (not a full interoperability standard yet)  
+**Status:** archived experimental reference — **non-normative**; not the AnyTag v2 map specification, validator, or implementation authority
 **License:** MIT  
 **Git tag form:** `v0.1.1-draft` (documents omit the `v` prefix)
 
 > **AAP makes repository context addressable without requiring repository context to be loaded.**
+
+> **Non-normative legacy trial.** This repository records the 0.1 zone-based AAP experiment. It is intentionally not a compatibility target for AnyTag's v2 `workspace` / `self` / `nodes` dialect. Do not copy its schemas, examples, validation script, or `write` semantics into AnyTag production maps; use the consuming repository's versioned map contract.
 
 AAP is a **runtime-agnostic filesystem convention** for:
 

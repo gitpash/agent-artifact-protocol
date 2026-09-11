@@ -6,8 +6,10 @@ This document defines the generic protocol convention. Deployment-specific mode 
 **Kind:** Filesystem **convention** + JSON Schemas (draft; not a complete interop test suite)  
 **Version:** 0.1.1-draft  
 **Git tag:** `v0.1.1-draft`  
-**Status:** Draft  
+**Status:** Archived experimental reference — non-normative for AnyTag v2
 **Keywords:** MUST / MUST NOT / SHOULD / MAY as in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119)
+
+> **Legacy trial notice.** This specification defines the historical `version: 1` / `zones` experiment. It is not forward-compatible with, nor authoritative for, AnyTag's v2 `workspace` / `self` / `nodes` maps, resource references, or validation policy. Use the consuming repository's checked-in contract instead.
 
 ---
 

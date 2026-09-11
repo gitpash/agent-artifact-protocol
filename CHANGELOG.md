@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Deprecated
+
+- Archived the 0.1.1-draft material as a non-normative legacy trial. It remains reproducible for historical reference, but is not the AnyTag v2 map contract or validator.
+
 ## 0.1.1-draft — 2026-09-08
 
 ### Added

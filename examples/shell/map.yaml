@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../../schemas/map.schema.json
+# A shell has direct navigation hops; it does not copy each child's layout.
+version: 2
+workspace:
+  id: product-shell
+self:
+  id: product-shell
+  kind: repository
+  path: .
+layout:
+  artifacts: docs/artifacts/
+nodes:
+  - id: orders-api
+    kind: repository
+    path: services/orders-api
+    description: Orders domain service.
+    locator:
+      repo: example/product-orders-api
+    map:
+      path: .aap/map.yaml
+    write:
+      - maintainer

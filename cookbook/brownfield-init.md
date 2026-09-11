@@ -11,10 +11,10 @@ Add AAP orientation to an existing repo **without** rewriting its docs system.
    - Artifacts later (envelopes on touch)  
 
 2. **Pin upstream (optional but recommended)**  
-   Record tag/commit in a one-line note, e.g. `.aap/VERSION`:
+   Record the immutable v2 tag or commit in a one-line note, e.g. `.aap/VERSION`. Do not validate against a floating branch tip:
 
    ```text
-   v0.1.1-draft
+   v0.2.0-draft
    https://github.com/gitpash/agent-artifact-protocol
    ```
 
@@ -39,7 +39,7 @@ Add AAP orientation to an existing repo **without** rewriting its docs system.
    Same task twice: without map vs with map. Measure time-to-locus and wrong-home paths.
 
 6. **Artifacts on touch**  
-   When a behavior change needs durable memory, copy an artifact template under `layout.artifacts` (same no-overwrite rule).
+   When a behavior change needs durable memory, use the first writable `layout.artifacts` resource reference (same no-overwrite rule). In a brownfield corpus, keep legacy roots `read-only`; a material update creates or updates a canonical successor and leaves a compatibility pointer. Do not bulk-migrate.
 
 ## Anti-patterns
 

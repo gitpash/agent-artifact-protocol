@@ -1,0 +1,11 @@
+version: 2
+workspace:
+  id: invalid-resource
+self:
+  id: invalid-resource
+  kind: repository
+layout:
+  artifacts:
+    path: docs/features/
+    access: write-only
+nodes: []

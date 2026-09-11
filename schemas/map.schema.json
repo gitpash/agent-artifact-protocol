@@ -1,48 +1,68 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/gitpash/agent-artifact-protocol/v0.1.1-draft/schemas/map.schema.json",
-  "title": "AAP Map v0.1",
+  "$id": "https://gist.githubusercontent.com/gitpash/928c100ebf269acf9db7c09a18ed4a68/raw/map.schema.json",
+  "title": "AAP Map (workspace / self / nodes) — single convention",
+  "description": "Pilot map schema. Additive evolution preferred while adoption is near-zero. Layout paths use resourceRef (path + optional access) so write fences share the same permission class as nodes.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "zones"],
+  "required": ["version", "workspace", "self", "nodes"],
   "properties": {
     "version": {
       "type": "integer",
-      "enum": [1],
-      "description": "Map format version."
+      "enum": [2],
+      "description": "Map format version 2 — semantic surface router. Still 2: resourceRef is additive (string paths remain valid)."
     },
-    "defaults": {
+    "workspace": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["id"],
       "properties": {
-        "layout": { "$ref": "#/$defs/layoutObject" }
+        "id": { "$ref": "#/$defs/id" },
+        "description": { "type": "string" }
       }
     },
-    "zones": {
+    "self": {
       "type": "object",
-      "minProperties": 1,
-      "propertyNames": {
-        "type": "string",
-        "pattern": "^[a-z][a-z0-9-]*$"
-      },
-      "additionalProperties": { "$ref": "#/$defs/zoneObject" }
+      "additionalProperties": false,
+      "required": ["id", "kind"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "parent": { "$ref": "#/$defs/parentObject" }
+      }
+    },
+    "layout": { "$ref": "#/$defs/layoutObject" },
+    "nodes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nodeObject" }
+    },
+    "relations": {
+      "type": "array",
+      "description": "Optional local topology hints — not a global dependency graph.",
+      "items": { "$ref": "#/$defs/relationObject" }
     },
     "overlays": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Prefer map.local.yaml (gitignored) instead of committing absolute paths.",
+      "description": "Prefer map.local.yaml (gitignored) for absolute checkout paths.",
       "properties": {
+        "nodes": {
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/id" },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
         "local_paths": {
           "type": "object",
-          "propertyNames": {
-            "type": "string",
-            "pattern": "^[a-z][a-z0-9-]*$"
-          },
-          "additionalProperties": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Absolute path or workspace-relative path to a checkout root for a zone id."
-          }
+          "propertyNames": { "$ref": "#/$defs/id" },
+          "additionalProperties": { "type": "string", "minLength": 1 }
         }
       }
     },
@@ -52,35 +72,61 @@
       "properties": {
         "enabled": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 },
-          "description": "Opt-in profile ids. Unknown ids must not break parse."
+          "items": { "type": "string", "minLength": 1 }
         }
       }
     }
   },
   "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "minLength": 1
+    },
+    "pathString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!.*\\.\\.)(?!/).*$",
+      "description": "Path relative to workspace root; / separators; no .. or absolute."
+    },
+    "access": {
+      "type": "string",
+      "enum": ["read-only", "read-write"],
+      "description": "Shared permission class. read-only = agents MUST NOT write/create durable content here; read still allowed. Default when omitted: read-write. Human lifecycle words (legacy/deprecated) belong in description, not a separate enum."
+    },
+    "resourceRef": {
+      "oneOf": [
+        { "$ref": "#/$defs/pathString" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path"],
+          "properties": {
+            "path": { "$ref": "#/$defs/pathString" },
+            "access": { "$ref": "#/$defs/access" },
+            "description": {
+              "type": "string",
+              "description": "Optional human note only. Agents gate on access, not on this text."
+            }
+          }
+        }
+      ],
+      "description": "Addressable path resource. String shorthand ≡ { path: <string>, access: read-write }. Object form adds optional access (same enum as nodes)."
+    },
     "pathOrPaths": {
       "oneOf": [
-        {
-          "type": "string",
-          "minLength": 1,
-          "pattern": "^(?!.*\\.\\.)(?!/).*$",
-          "description": "Path relative to resolved zone root; / separators; no .. or absolute."
-        },
+        { "$ref": "#/$defs/resourceRef" },
         {
           "type": "array",
           "minItems": 1,
-          "items": {
-            "type": "string",
-            "minLength": 1,
-            "pattern": "^(?!.*\\.\\.)(?!/).*$"
-          }
+          "items": { "$ref": "#/$defs/resourceRef" }
         }
-      ]
+      ],
+      "description": "One resourceRef or a list. Write home = first entry whose access is not read-only (after normalize)."
     },
     "layoutObject": {
       "type": "object",
-      "description": "Intent → path router. Core keys documented in SPEC; additional keys are extensions.",
+      "description": "Intent → path router. Values are resourceRef(s). Known keys are hints; additionalProperties allowed for extensions.",
       "properties": {
         "code": { "$ref": "#/$defs/pathOrPaths" },
         "tests": { "$ref": "#/$defs/pathOrPaths" },
@@ -89,100 +135,91 @@
         "scripts": { "$ref": "#/$defs/pathOrPaths" },
         "infra": { "$ref": "#/$defs/pathOrPaths" },
         "proposals": { "$ref": "#/$defs/pathOrPaths" },
-        "architecture": { "$ref": "#/$defs/pathOrPaths" }
+        "architecture": { "$ref": "#/$defs/pathOrPaths" },
+        "devops": { "$ref": "#/$defs/pathOrPaths" }
       },
       "additionalProperties": { "$ref": "#/$defs/pathOrPaths" }
     },
-    "remoteObject": {
+    "mapPointerObject": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "path": { "type": "string", "minLength": 1 },
         "url": { "type": "string", "minLength": 1 },
-        "repo": {
-          "type": "string",
-          "description": "owner/name shorthand"
-        },
-        "id": { "type": "string" },
+        "ref": { "type": "string", "minLength": 1 }
+      },
+      "anyOf": [
+        { "required": ["path"] },
+        { "required": ["url"] }
+      ]
+    },
+    "locatorObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repo": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "minLength": 1 },
+        "id": { "type": "string", "minLength": 1 },
         "default_branch": { "type": "string" }
       },
       "anyOf": [
-        { "required": ["url"] },
         { "required": ["repo"] },
+        { "required": ["url"] },
         { "required": ["id"] }
       ]
     },
-    "aapPointerObject": {
+    "parentObject": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Paths relative to resolved foreign root.",
+      "required": ["id"],
+      "description": "Optional immediate navigation parent. Groups the current repository for orientation; does not imply ownership, authorization, inherited policy, or recursive traversal.",
       "properties": {
-        "map": { "type": "string", "minLength": 1 },
-        "spec": { "type": "string", "minLength": 1 },
-        "version": { "type": "string" }
+        "id": { "$ref": "#/$defs/id" },
+        "locator": { "$ref": "#/$defs/locatorObject" },
+        "map": { "$ref": "#/$defs/mapPointerObject" }
       }
     },
-    "zoneObject": {
+    "mirrorObject": {
       "type": "object",
       "additionalProperties": false,
-      "required": [],
       "properties": {
-        "path": {
-          "type": "string",
-          "minLength": 1,
-          "description": "In-workspace root relative to workspace root. Required for internal zones."
-        },
-        "relation": {
-          "type": "string",
-          "enum": ["internal", "external"],
-          "description": "Default internal when omitted."
-        },
-        "remote": { "$ref": "#/$defs/remoteObject" },
-        "aap": { "$ref": "#/$defs/aapPointerObject" },
-        "mirrors": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Workspace-relative path for mirror artifacts about this zone (esp. external)."
-        },
-        "kind": {
-          "type": "string",
-          "description": "Soft hint. Recommended: root|backend|frontend|infra|batch|mixed|external. Unknown allowed."
-        },
+        "path": { "type": "string", "minLength": 1 }
+      },
+      "required": ["path"]
+    },
+    "nodeObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "path": { "type": "string", "minLength": 1 },
+        "locator": { "$ref": "#/$defs/locatorObject" },
+        "map": { "$ref": "#/$defs/mapPointerObject" },
+        "mirror": { "$ref": "#/$defs/mirrorObject" },
         "access": {
-          "type": "string",
-          "enum": ["read-only", "read-write"]
+          "$ref": "#/$defs/access",
+          "description": "Same permission class as resourceRef.access. External consume-only hops use read-only."
         },
         "write": {
           "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          },
-          "description": "Deployment-defined mutating mode labels. Empty array = no declared write grant. Core does not define a universal role vocabulary."
-        },
-        "layout": { "$ref": "#/$defs/layoutObject" }
-      },
-      "allOf": [
-        {
-          "if": {
-            "properties": { "relation": { "const": "external" } },
-            "required": ["relation"]
-          },
-          "then": {
-            "required": ["remote"]
-          }
-        },
-        {
-          "if": {
-            "anyOf": [
-              { "properties": { "relation": { "const": "internal" } }, "required": ["relation"] },
-              { "not": { "required": ["relation"] } }
-            ]
-          },
-          "then": {
-            "required": ["path"]
-          }
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Optional role hints (e.g. domain, architect). NOT a filesystem ACL — use access for write fence. Empty/absent is not a grant by itself."
         }
-      ]
+      }
+    },
+    "relationObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "type"],
+      "properties": {
+        "from": { "$ref": "#/$defs/id" },
+        "to": { "$ref": "#/$defs/id" },
+        "type": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" }
+      }
     }
   }
 }

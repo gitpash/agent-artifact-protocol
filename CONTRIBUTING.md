@@ -6,15 +6,16 @@ Thank you for helping keep the Core **small**.
 
 | Place | Form |
 |-------|------|
-| Documents / CHANGELOG | `0.1.1-draft` (no `v`) |
-| Git tags | `v0.1.1-draft` (with `v`) |
+| Documents / CHANGELOG | `0.2.0-draft` (no `v`) |
+| Git tags | `v0.2.0-draft` (with `v`) |
 
 ## What belongs in Core vs elsewhere
 
 | In Core (expensive) | Profile / cookbook / later |
 |---------------------|----------------------------|
-| Map discovery + layout intents | Natural-language task routing |
-| Envelope field set + core types | New core types without evidence |
+| Map v2 discovery + layout intents | Natural-language task routing |
+| `resourceRef` path/access shape | Repository-specific legacy path rules |
+| Historical envelope draft | New mandatory artifact placement metadata without evidence |
 | Progressive disclosure rules | Runtime adapters (Claude, CI bots) |
 | `write` / `access` as **hints** | Real ACL / auth systems |
 | Deployment-defined mode labels | Universal role vocabulary |
@@ -45,6 +46,6 @@ python scripts/validate.py
 
 CI runs the same script on PRs.
 
-## Security of `write`
+## Write-home and security
 
-PRs must not describe `write` as authentication or sandboxing. Host Git permissions and runtime policy enforce real boundaries. The Core schema accepts deployment-defined non-empty string labels for `write`; adapters may map local roles to them.
+PRs must not describe `write` or `access` as authentication or sandboxing. Host Git permissions and runtime policy enforce real boundaries. A layout string normalizes to writable; `access: read-only` removes that layout reference from write-home selection. `write` remains deployment-defined node metadata, and adapters may map local roles to it.

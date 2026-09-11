@@ -1,26 +1,16 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/gitpash/agent-artifact-protocol/v0.1.1-draft/schemas/map.schema.json
-#
-# AAP L0 orientation map — keep this file small.
-# Copy to: .aap/map.yaml  (or map.yaml / docs/map.yaml)
-# Do not overwrite an existing map without explicit confirmation.
-#
-version: 1
-
-defaults:
-  layout:
-    artifacts: docs/artifacts/
-    scratch: docs/scratch/
-
-zones:
-  # Single-repo default: one zone covering the tree
-  app:
-    path: .
-    kind: mixed
-    # Deployment-defined coordination labels only — NOT access control / sandboxing.
-    # Replace these example values with labels used by your deployment.
-    write: [maintainer]
-    layout:
-      code: src/                 # ← change to your code root
-      tests: tests/              # ← change to your test root
-      artifacts: docs/artifacts/
-      scratch: docs/scratch/
+# yaml-language-server: $schema=https://gist.githubusercontent.com/gitpash/928c100ebf269acf9db7c09a18ed4a68/raw/9bec3c5cb3cc259e6197746a1c753adfe952f8cc/map.schema.json
+# AAP v2 L0 orientation map — keep this file small.
+# Copy to .aap/map.yaml. Do not overwrite an existing map without confirmation.
+version: 2
+workspace:
+  id: my-repository
+self:
+  id: my-repository
+  kind: repository
+  path: .
+layout:
+  code: src/
+  tests: tests/
+  artifacts: docs/artifacts/
+  scratch: docs/scratch/
+nodes: []

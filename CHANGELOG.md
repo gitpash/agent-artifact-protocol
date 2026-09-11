@@ -1,10 +1,18 @@
 # Changelog
 
-## Unreleased
+## 0.2.0-draft — Unreleased
 
-### Deprecated
+### Changed
 
-- Archived the 0.1.1-draft material as a non-normative legacy trial. It remains reproducible for historical reference, but is not the AnyTag v2 map contract or validator.
+- Replaced the v1 `zones` map with the repository-oriented v2 `workspace` / `self` / `nodes` map.
+- Added `resourceRef` layout values: backward-compatible strings or `{ path, access?, description? }` objects.
+- Defined deterministic write-home selection: first reference whose normalized access is not `read-only`.
+- Added a generic optional `brownfield-artifacts` profile for one writable artifact home and migrate-on-touch pointers.
+- Moved v1 schemas and examples to historical `legacy/v1/` material; v1 is not v2-compatible.
+
+### Kept out of Core
+
+- Repository-specific external-node restrictions, path-name rules, CI workflows, IAM, and agent runtimes remain local policy or adapters.
 
 ## 0.1.1-draft — 2026-09-08
 

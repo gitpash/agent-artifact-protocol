@@ -1,6 +1,6 @@
 # AAP Motivation (outline)
 
-**Status:** outline paired with SPEC 0.1.1-draft  
+**Status:** outline paired with Map v2 SPEC 0.2.0-draft
 
 ---
 
@@ -14,7 +14,7 @@ Training priors invent paths (`.claude/spec`, random `docs/`, `.specify/`). Team
 
 > Make repository context **addressable** without requiring repository context to be **loaded**.
 
-- **Map** = layout-category addresses (e.g. `code` → zone → directory root)  
+- **Map** = repository + direct-node + layout-category addresses (e.g. `repository` → `code` → directory root)
 - **Artifacts** = optional durable depth  
 - **Retrieval** = existing tools (`grep`, LSP, indexes, MCP, …)  
 - **Not** a proprietary context engine  
@@ -47,7 +47,7 @@ Anti-feature: “before starting, read these 14 protocol files.”
 
 | Layer | Job |
 |-------|-----|
-| Orientation | map, zones, layout intents, thin write fences |
+| Orientation | repository map, direct nodes, layout intents, thin write fences |
 | Durable artifacts | envelope, types, stability/maintain |
 
 If artifacts swallow orientation, AAP has failed.

@@ -1,0 +1,11 @@
+version: 2
+workspace:
+  id: invalid-path
+self:
+  id: invalid-path
+  kind: repository
+layout:
+  artifacts:
+    - path: /tmp/not-a-workspace-path
+      access: read-write
+nodes: []

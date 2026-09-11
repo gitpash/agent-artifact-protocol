@@ -1,305 +1,91 @@
-# AAP Core Specification
+# AAP Map v2 Specification
 
-This document defines the generic protocol convention. Deployment-specific mode labels, ownership terminology, and enforcement live outside Core.
+**Name:** Agent Artifact Protocol (AAP)
+**Kind:** filesystem convention + JSON Schema
+**Version:** 0.2.0-draft
+**Status:** experimental
 
-**Name:** Agent Artifact Protocol (AAP)  
-**Kind:** Filesystem **convention** + JSON Schemas (draft; not a complete interop test suite)  
-**Version:** 0.1.1-draft  
-**Git tag:** `v0.1.1-draft`  
-**Status:** Archived experimental reference — non-normative for AnyTag v2
-**Keywords:** MUST / MUST NOT / SHOULD / MAY as in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119)
+AAP makes repository context addressable without requiring it to be loaded. It is a small, runtime-agnostic navigation convention for repositories and optional durable artifacts. It is not a context engine, agent framework, retrieval protocol, dependency graph, or authorization system.
 
-> **Legacy trial notice.** This specification defines the historical `version: 1` / `zones` experiment. It is not forward-compatible with, nor authoritative for, AnyTag's v2 `workspace` / `self` / `nodes` maps, resource references, or validation policy. Use the consuming repository's checked-in contract instead.
+## Core model
 
----
-
-## 0. Abstract
-
-AAP is a **runtime-agnostic filesystem convention** for repository orientation and optional durable agent/human memory.
-
-**One-liner:** *AAP makes repository context addressable without requiring repository context to be loaded.*
-
-It standardizes:
-
-1. **Thin topology (map)** — zones + **layout-category** → directory root addresses  
-2. **Artifacts** — typed envelope-addressable units when memory must persist  
-3. **Duty classes** — scratch vs durable maintain expectations  
-4. **Light conformance** — orientation / artifact / topology labels  
-
-It does **not** standardize retrieval engines, agent orchestration, embeddings, IDE hooks, task trackers, or OS/Git access control.
-
-In v0.1, layout “intents” are **fixed vocabulary keys** (`code`, `tests`, `artifacts`, `scratch`, …), not natural-language task routing.
-
-**Philosophy:** conventions over infrastructure; discovery over preloading; progressive disclosure over context dumping; files over runtime dependencies.
-
----
-
-## 1. Goals and non-goals
-
-### 1.1 Goals
-
-- Improve agent navigation **without** becoming another context dependency  
-- Stop path hallucination via explicit layout intents when a map is present  
-- Keep Source of Truth in git-diffable files  
-- Brownfield adoption (`migrate-on-touch`) without mass rewrite  
-- Keep the **L0 orientation surface tiny**  
-
-### 1.2 Non-goals
-
-- Not a context engine, RAG stack, or dynamic context loader  
-- Not an agent framework or step engine  
-- Not a replacement for LSP, tests, or `grep`/search  
-- Not mandatory embeddings or knowledge graphs  
-- Not GitHub-only process binding  
-- Not a mandate to preload SPEC, schemas, or artifact corpora at session start  
-- Not a security boundary: `write` / `access` do **not** authenticate or sandbox agents  
-- Not a natural-language intent classifier
-
-### 1.3 Progressive disclosure (normative)
-
-| Level | What | When |
-|-------|------|------|
-| **L0** | Map only | New session / workspace |
-| **L1** | Optional zone index | After intent→zone |
-| **L2** | One artifact | Durable memory needed |
-| **L3** | Code + tools | Implementation evidence |
-
-**MUST NOT:**
-
-1. Require loading the entire artifact library, this upstream repository, or full SPEC into model context to begin work.  
-2. Define a proprietary retrieval protocol; tools resolve addresses.  
-3. Implement adapters as “always attach full AAP docs to the system prompt.”  
-
-Producers SHOULD keep maps sparse. Essays belong in L1/L2, not the map.
-
-**Orientation leads; artifacts follow.** Artifact features MUST NOT force L0 bloat.
-
----
-
-## 2. Concepts
-
-| Term | Meaning |
-|------|---------|
-| **Workspace** | Tree where the agent operates |
-| **Map** | Registry of zones (+ optional defaults, overlays, profiles list) |
-| **Zone** | Named **placement and coordination** scope; ownership is optional and not implied |
-| **Layout** | Layout-category key → directory root(s) relative to resolved zone root |
-| **Layout key (v0.1 “intent”)** | Vocabulary token: `code`, `tests`, `artifacts`, `scratch`, … — not free-text tasks; `artifacts` denotes the AAP-addressable durable-artifact root |
-| **Artifact** | Durable unit with Core envelope + body |
-| **Envelope** | Portable metadata (YAML frontmatter or sidecar) |
-| **Derived** | Regenerable views (HTML, vectors, graphs) — not canonical SoT |
-
----
-
-## 3. Map
-
-### 3.1 Discovery (first hit wins)
-
-1. `./.aap/map.yaml`  
-2. `./map.yaml`  
-3. `./docs/map.yaml`  
-
-L0 agents SHOULD read **only** this file at orientation unless the task already names paths.
-
-### 3.2 Shape
+An agent starts with one small `.aap/map.yaml`, then opens only the repository, path, or artifact relevant to the task. Linked maps are explicit hops and **MUST NOT** be recursively preloaded.
 
 ```yaml
-version: 1
-defaults:
-  layout: { ... }
-zones:
-  <zone-id>:
-    path: <rel path from workspace root>   # required for internal zones
-    kind: <string>                         # soft hint
-    write: [maintainer]                    # deployment-defined labels; may be []
-    access: read-only | read-write         # optional
-    layout: { ... }
-overlays:                                  # prefer gitignored map.local.yaml
-  local_paths:
-    <zone-id>: <absolute or other checkout path>
-profiles:
-  enabled: [<id>, ...]                     # optional; unknown ids ignored
+version: 2
+workspace: { id: my-repository }
+self: { id: my-repository, kind: repository, path: . }
+layout: { code: src/, artifacts: docs/artifacts/ }
+nodes: []
 ```
 
-- **version:** MUST be `1` for this draft.  
-- **Zone ids:** SHOULD match `^[a-z][a-z0-9-]*$`.  
-- **path:** Relative to workspace root; `.` for repo root.  
-- **write:** Deployment-defined mutating mode labels. Empty = no declared write grant. **Not authentication.** Core does not define a universal role vocabulary.
-- **access:** Optional descriptive state: `read-only` or `read-write`; it does not grant authorization. Prefer `access: read-only` with `write: []` for consume-only zones. `write` controls declared mutating modes; an empty list means no mode may claim a write grant, regardless of `access`.
+- `workspace` identifies the opened workspace.
+- `self` describes its repository. `self.parent`, when present, is one bounded navigation/container pointer; it does not imply ownership, authorization, dependency, inherited policy, or recursive traversal.
+- `nodes` are direct navigational hops to related repositories or products, not a dependency graph.
+- `locator` identifies a node independently of a local checkout; `map` points at its map when deeper inspection is needed.
+- `layout` maps fixed vocabulary keys (`code`, `tests`, `artifacts`, `scratch`, and extensions) to directory roots in the current workspace.
+- `overlays.nodes` is optional machine-local checkout GPS. An overlay resolves navigation only and never grants write authority.
 
-#### Active mutating mode (runtime input)
+The normative schema is [`schemas/map.schema.json`](./schemas/map.schema.json). Consumers pin a release tag or commit; ordinary sessions read the local map rather than fetching upstream.
 
-- The **active mode** is supplied by the human or host adapter (for example, a deployment may use `maintainer` or `reviewer`).
-- It is **not** an authenticated identity and MUST NOT be inferred solely from file presence.  
-- **If no active mutating mode is explicitly provided, the default is no write grant** (orientation/read only).  
-- Adapters MAY map UI roles to deployment-defined mode labels; Core does not define SSO or permissions.
-- AAP **cannot** stop writes outside layout roots; Git permissions, CODEOWNERS, and sandboxes do.
+## Layout resource references
 
-Machine-local overlays SHOULD use `map.local.yaml` / `docs/map.local.yaml` / `.aap/map.local.yaml` (gitignored). Absolute paths MUST NOT be required for CI.
+Every layout value is a `resourceRef`, either a backward-compatible path string or an object:
 
-JSON Schema: [`schemas/map.schema.json`](./schemas/map.schema.json).
-
-### 3.3 Layout keys (directory categories)
-
-Layout MUST NOT inventory individual source files.  
-This is **layout-based discovery**, not natural-language intent routing.
-
-**Core keys:** `code`, `tests`, `artifacts`, `scratch`. The `artifacts` key means the canonical root for AAP-addressable durable artifacts in that zone, not generic build output.
-**Standard optional:** `scripts`, `infra`, `proposals`, `architecture`  
-**Extension:** any other key → path or path list  
-
-Paths: relative to resolved zone root; `/` separators; MUST NOT contain `..`; SHOULD NOT be absolute.
-
-**Merge:** zone `layout` overrides `defaults.layout` key-wise (replace).  
-**Write target:** first listed root for a key unless specified.  
-**Missing key:** MUST NOT invent a parallel conventional root for a key that already exists; ask or fail closed for that write.
-
-### 3.4 Resolved root
-
-```text
-if overlays.local_paths[zone] exists → use it
-else join(workspace, zone.path) if present
-else UNRESOLVED for tree IO (zone metadata may still be useful)
+```yaml
+layout:
+  artifacts:
+    - path: docs/features/
+      access: read-write
+    - path: legacy/features/
+      access: read-only
+      description: Historical corpus; keep discoverable for reading.
 ```
 
-Longest-prefix match of resolved roots selects the zone for a filesystem path.
+- A string normalizes to `{ path: <string>, access: read-write }`.
+- Object `access` defaults to `read-write` when absent.
+- Paths are workspace-relative and MUST NOT be absolute or traverse through `..`.
+- `access` is `read-only` or `read-write`. It is an agent coordination fence, not OS/Git/IAM authorization.
+- A durable write home for a layout key is the first reference whose normalized access is not `read-only`.
+- If no writable reference exists, an agent MUST fail closed for a durable write and ask; it MUST NOT invent a parallel root.
 
-### 3.5 External zones (provisional)
+`write` on a node is an optional, deployment-defined role hint. It is separate from path access and does not grant filesystem permission. Git permissions, CODEOWNERS, protected branches, and sandboxes enforce real boundaries.
 
-`relation: external` + `remote` is schema-compatible and **not required** for Core orientation conformance.  
-Use for partner checkouts without git submodules. Details may graduate via a future profile; consumers MAY ignore unknown external-only fields.
+## Brownfield artifacts profile
 
-### 3.6 When a map is required
+`brownfield-artifacts` is an optional profile for repositories with a legacy documentation corpus:
 
-| Workspace | Map |
-|-----------|-----|
-| Claiming **topology** multi-root orientation | SHOULD provide a map |
-| Single repo orientation | MAY use one-zone map or omit (artifact-only still possible) |
+1. Declare at most one writable `layout.artifacts` home.
+2. Keep old roots addressable as `read-only` rather than removing history or bulk-moving it.
+3. On a material update, create or update the canonical successor in the write home and retain a compatibility pointer in the legacy record.
+4. Typos or urgent factual corrections may be fixed in place without making the old root a home for new durable documents.
 
----
+This profile does not reserve path names or mandate a migration date.
 
-## 4. Artifacts
+## Artifacts
 
-### 4.1 Envelope (required when claiming AAP addressability)
+Artifacts remain optional Markdown (or profile-defined) durable units. The existing v0.1 artifact envelope is retained as a separate historical draft; map v2 does not automatically redefine artifact placement metadata. A future artifact-envelope revision may generalize its `zone` field based on usage evidence.
 
-| Field | Rule |
-|-------|------|
-| `id` | Stable; MUST NOT reuse for a new meaning |
-| `type` | Core enum or dotted extension |
-| `zone` | Map zone id, or default single-zone id |
-| `status` | `draft` \| `active` \| `deprecated` |
-| `updated` | `YYYY-MM-DD` |
+## Progressive disclosure
 
-**`updated` semantics:** date when artifact **content or envelope was last materially changed**. It is **not** a verification timestamp (a future `last_verified` MAY be added; not required in 0.1). Typo-only fixes MAY leave `updated` unchanged; meaning changes SHOULD bump it. Timezone: calendar date as agreed by the team (UTC date RECOMMENDED for distributed teams).
+| Level | Read | When |
+|---|---|---|
+| L0 | map only | workspace orientation |
+| L1 | targeted path/index | after choosing a layout key or node |
+| L2 | one artifact | durable memory is needed |
+| L3 | code and normal tools | implementation evidence |
 
-Recommended: `title`, `summary`, `stability`, `maintain`, `owner`, `refs`, `supersedes` / `superseded_by`.
+Maps should stay sparse. Essays, whole corpora, graph indexes, embeddings, adapters, and workflow machinery do not belong in the mandatory L0 read.
 
-Producers SHOULD prefer stable namespace-like ids such as `<zone>/<type>/<slug>`. Core does not provide distributed id allocation; uniqueness across an artifact corpus is a tooling concern.
+## Versioning and migration
 
-JSON Schema: [`schemas/artifact-envelope.schema.json`](./schemas/artifact-envelope.schema.json).
+Map v2 is a breaking replacement for the historical v1 `zones` dialect. A v1 map is not auto-converted and MUST be deliberately migrated. Keep a tagged `v0.1.1-draft` checkout for historical validation. Additive v2 changes preserve existing string-layout maps; a breaking rename/removal requires a map version bump, migration note, and changelog entry.
 
-**Schema posture (permissive Core):** the Core envelope schema validates **shape** of common fields. It does **not** require `type` to be only the five Core values (extensions allowed). It does **not** fully enforce dotted extension syntax. Profiles or repo linters MAY tighten `type` patterns. Cross-file rules (zone exists, unique ids, path under zone root) are **out of Core schema scope** in 0.1.
+## Validation
 
-### 4.2 Core types
-
-| type | Role |
-|------|------|
-| `capability` | What a zone exposes |
-| `decision` | Why this way |
-| `contract` | Cross-zone guarantee (prefer global/shell zone when multi-zone) |
-| `gotcha` | Costly rediscovery hazard |
-| `impact` | Change blast sketch (often short-lived) |
-
-Extension types SHOULD use a dot (`diagram.sequence`, …). Readers MUST parse Core fields even if `type` is unknown.
-
-### 4.3 Body
-
-- Default body: UTF-8 Markdown with YAML frontmatter.  
-- Non-Markdown canonical files: envelope via sidecar `*.aap.md` or `*.aap.yaml` + `canonical_path` / `body_format`.  
-- Bodies SHOULD stay small (Memoryfield-inspired ~8KiB guidance); split rather than grow endless pages.  
-
-### 4.4 stability / maintain
-
-| stability | Meaning |
-|-----------|---------|
-| `scratch` | Disposable; MUST NOT gate merge on freshness |
-| `experimental` | Trying a convention |
-| `durable` | Intentional memory |
-
-| maintain | Who pays |
-|----------|----------|
-| `nobody` | No duty |
-| `owner` | Named owner |
-| `zone` | Zone writers |
-| `core` | Rare; workspace-wide expectation |
-
-Committed ≠ must maintain. Scratch is first-class.
-
-### 4.5 refs
-
-Opaque strings. URI-like forms RECOMMENDED (`gh:owner/repo#1`, `id:other`, `path:…`). Core MUST NOT require a single tracker.
-
----
-
-## 5. Agent algorithms
-
-### 5.1 Orientation (default)
-
-```text
-1. Discover map only
-2. Merge local overlays if present
-3. Choose zone + layout key from task (human/agent judgment — not NL classifier in Core)
-4. Targeted retrieve under layout roots (grep/LSP/index/…)
-5. Open specific artifacts only if needed
-6. Open SPEC only when editing/validating convention structure
+```bash
+pip install pyyaml jsonschema
+python scripts/validate.py
 ```
 
-### 5.2 Write
-
-```text
-1. Orient via map
-2. Determine active mutating mode from explicit user/runtime input (default: none)
-3. If mode absent or not in zone.write → do not claim write grant; ask or stay read-only
-4. Resolve layout key path
-5. Do not invent parallel roots
-6. Write envelope + body
-7. Cross-zone conflict → BLOCKED with reason (not silent foreign edits)
-```
-
-Remember: even a declared grant is a **hint**; hosts enforce real filesystem policy.
-
----
-
-## 6. Conformance labels
-
-| Label | Meaning |
-|-------|---------|
-| **Orientation** | Discoverable sparse map; intent routing possible |
-| **Artifact** | Claimed AAP notes carry required envelope fields |
-| **Topology** | Multi-root zones with honest paths / resolution rules |
-
-Optional schema validation is L1+. L0 MUST work without a linter.
-
----
-
-## 7. Distribution and pinning
-
-- This repository is a **blueprint**, not a live session dependency.  
-- Consumers SHOULD pin a **tag or commit** if they vendor schemas/templates.  
-- Ordinary agent turns MUST use the **local** map, not fetch upstream.  
-- Bootstrap tools (if any) MUST be explicit, additive, dry-run capable, human-reviewed.  
-
----
-
-## 8. Security
-
-- Artifacts MUST NOT store secrets or raw PII.  
-- Write/access fields are coordination fences, not authentication.  
-- Map edits that expand write authority are sensitive in review.  
-
----
-
-## 9. Versioning
-
-Breaking Core changes require a version bump and changelog entry.  
-`0.1.1-draft` may still change before `0.1.1`.
+The validator checks schemas, v2 examples, resource-reference path safety, and invalid fixtures. Repository-specific policies—such as requiring external nodes to be read-only—belong in that repository's own validator or profile.

@@ -1,38 +1,45 @@
 # Agent Artifact Protocol (AAP)
 
 **Version:** 0.2.1-prototype  
-**Status:** experimental Map v2 Core + dogfood-informed **optional** profiles (working-prototype **docs**)  
+**Status:** experimental · docs-only prototype  
 **License:** MIT  
 **Git tag:** [`v0.2.1-prototype`](https://github.com/gitpash/agent-artifact-protocol/releases/tag/v0.2.1-prototype)  
-**Documents omit the `v` prefix** (`0.2.1-prototype`).
+(Documents omit the `v` prefix: `0.2.1-prototype`.)
 
 > **AAP makes repository context addressable without requiring repository context to be loaded.**
 
-AAP is a **runtime-agnostic filesystem convention**: a tiny map in the repo so agents (and humans) can **find the right place** without dumping CLAUDE/SPEC/wiki into the prompt.
+AAP is a **runtime-agnostic filesystem convention**: a tiny map in the repo so agents (and humans) can **find the right place** without dumping the whole project into the prompt.
 
-It is **not** a context engine, RAG stack, agent harness, security sandbox, or mandatory preload pack.
+| AAP is | AAP is not |
+|--------|------------|
+| Sparse **map** + progressive disclosure | Context engine / RAG |
+| Optional **profiles** in the cookbook | Agent harness or multi-agent runtime |
+| Coordination hints (`write` / `access`) | Security sandbox or ACL |
+| Pinned templates you copy once | Something fetched every agent turn |
+
+**AAP does not replace `AGENTS.md` / `CLAUDE.md`:** those say *how to work*; the map says *where things are*. They can live side by side.
 
 ---
 
 ## What problem is this for?
 
-Coding agents waste turns on **orientation failure** and **context pollution**:
+Coding agents often fail on **orientation** and **context pollution**, not on “missing a wiki page.”
 
-| Failure | What happens |
-|---------|----------------|
-| Wrong home | Edits land in the wrong package, service, or “docs that look related” |
-| Preload bloat | Session starts by reading constitutions, full catalogs, every submodule map |
-| No GPS | Multi-repo / monorepo: path ≠ GitHub name; nobody knows the hop |
-| Fake confidence | “PR ready” with red CI or blockers invented without evidence |
+| Failure | What happens | Addressed by |
+|---------|----------------|--------------|
+| Wrong home | Edits land in the wrong package or “docs that look related” | **Core** (layout) |
+| Preload bloat | Session opens constitutions, catalogs, every submodule map | **Core** (L0→L3) |
+| No GPS | Multi-repo: path ≠ GitHub name; no clear hop | **Core** (nodes) |
+| Fake confidence | “PR ready” with red CI / invented blockers | ***Profile*** ([done-bar](./cookbook/done-bar.md)) |
 
-AAP’s bet: **a sparse map + progressive disclosure** beats a bigger prompt.
+**AAP’s bet** (thesis, not a measured claim here): a sparse map + disclosure beats a bigger prompt. See [`MOTIVATION.md`](./MOTIVATION.md); validate with a local A/B (below) before you expand.
 
 ```mermaid
 flowchart LR
-  subgraph before [Without AAP]
-    A[Agent starts] --> B[Dump CLAUDE / wiki / all maps]
+  subgraph before [Without a map]
+    A[Agent starts] --> B["Read AGENTS.md / wiki,<br/>grep around"]
     B --> C[Guess locus]
-    C --> D[Wrong home or token blow-up]
+    C --> D[Wrong home or wasted turns]
   end
 
   subgraph after [With AAP]
@@ -60,47 +67,81 @@ self:
   id: my-app
   kind: repository
   path: .
+  # parent:                 # optional — see vocabulary
+  #   id: my-hub
+  #   path: ../..           # or map.path hop; navigation only
 layout:
   code: src/
   tests: tests/
-  artifacts: docs/artifacts/    # optional durable notes
-  scratch: docs/scratch/        # optional throwaway notes
-nodes: []                         # or direct hops to related repos
+  artifacts: docs/artifacts/   # optional durable notes
+  scratch: docs/scratch/       # optional throwaway notes
+nodes: []                        # or direct hops to related repos
 ```
 
 | Piece | Role |
 |-------|------|
 | **workspace / self** | What you opened |
-| **layout** | Vocabulary keys (`code`, `tests`, `artifacts`, `scratch`, …) → directories |
-| **nodes** | Direct **navigation hops** (related repos/products) — not a dependency graph |
-| **resourceRef** | Path string or `{ path, access?, description? }` (`access: read-only` = coordination fence, not ACL) |
+| **self.parent** | Optional **one** navigation/container pointer (no ownership, auth, or recursive preload) |
+| **layout** | Keys (`code`, `tests`, `artifacts`, `scratch`, …) → directories |
+| **nodes** | Direct **navigation hops** — not a dependency graph |
+| **resourceRef** | Path string or `{ path, access?, description? }` (`access: read-only` = coordination fence, **not** ACL) |
 
-### 2. Progressive disclosure (do not load the universe)
+Layout keys are **not** a natural-language task classifier. The human/agent chooses the task; AAP only says where `code` / `tests` live.
+
+### 2. Progressive disclosure
 
 ```mermaid
 flowchart TD
-  L0["L0 — Map only<br/>Orientation conformance"]
+  L0["L0 — Map only<br/>(Orientation conformance)"]
   L1["L1 — One layout path or node hop"]
-  L2["L2 — One durable artifact if needed"]
-  L3["L3 — Code + grep / LSP / indexes<br/>outside AAP"]
+  L2["L2 — One durable artifact"]
+  L3["L3 — Code + grep / LSP / indexes<br/>(outside AAP)"]
 
-  L0 --> L1 --> L2 --> L3
+  L0 --> L1
+  L1 --> L3
+  L1 -.->|only if durable memory is needed| L2
+  L2 -.-> L3
 
-  P["Optional profile bootstrap<br/>thin orientation + exactly one stream pack"]
-  L0 -.-> P
-  P -.-> L1
+  subgraph side [Optional profile — never part of L0]
+    P["Local orientation card +<br/>exactly one stream pack"]
+  end
 ```
 
 | Level | What | When |
 |-------|------|------|
-| **L0** | Map only | Session start |
-| **L1** | Targeted path / layout index | After choosing a key or node |
-| **L2** | One artifact | Durable memory needed |
+| **L0** | Map only | Session start (**Orientation**) |
+| **L1** | One path or node hop | After choosing a key or node |
+| **L2** | One artifact | **Only if** durable memory is needed |
 | **L3** | Normal engineering tools | Implementation |
 
 **MUST NOT:** force-load this upstream repo, the full SPEC, or an artifact corpus just to begin work.
 
-### 3. Multi-repo: hop, don’t preload
+Full rules: [`SPEC.md`](./SPEC.md).
+
+---
+
+## 60-second start (brownfield)
+
+1. Copy [`templates/minimal-map.yaml`](./templates/minimal-map.yaml) → `.aap/map.yaml`.
+2. Edit `self`, `layout`, and `nodes` for **your** tree (keep it sparse).
+3. Tell the agent: *read the local map first; do not preload AAP upstream docs.*
+4. A/B a real task: **no map** vs **map only**. If B does not help → **shrink the map**, do not add profiles.
+5. Only then optional profiles (hub / one stream pack / done-bar).
+
+**Pin** = which tag your copied templates came from. Nothing is fetched at agent runtime.
+
+```bash
+git clone --depth 1 --branch v0.2.1-prototype \
+  https://github.com/gitpash/agent-artifact-protocol.git /tmp/aap
+mkdir -p .aap && cp /tmp/aap/templates/minimal-map.yaml .aap/map.yaml
+# edit .aap/map.yaml — work from YOUR repo, not /tmp/aap
+```
+
+More detail: [`cookbook/schema-pinning.md`](./cookbook/schema-pinning.md), [`cookbook/brownfield-init.md`](./cookbook/brownfield-init.md).
+
+---
+
+## Multi-repo: hop, don’t preload
 
 ```mermaid
 flowchart TB
@@ -111,20 +152,21 @@ flowchart TB
   N2 --> C2["Child map optional"]
 ```
 
-Nodes are **doors**, not “git clone everything into context.”  
-See [`cookbook/hub-umbrella.md`](./cookbook/hub-umbrella.md) and [`examples/hub-umbrella/`](./examples/hub-umbrella/).
+Nodes are **doors**, not “load every submodule into context.”  
+[`cookbook/hub-umbrella.md`](./cookbook/hub-umbrella.md) · [`examples/hub-umbrella/`](./examples/hub-umbrella/).
 
-### 4. Optional profiles (not Core L0)
+---
+
+## Optional profiles (not Core L0)
 
 After map-only helps, you **may** add local procedure files (often gitignored):
 
 ```mermaid
 flowchart LR
-  M[Map L0] --> O[orientation.md<br/>thin card]
-  O --> S[One stream pack<br/>research / feature / …]
-  S --> D[done-bar at exit]
-  M --> W[work]
-  D --> W
+  M["Map (L0)"] --> O["orientation.md<br/>thin card"]
+  O --> S["One stream pack<br/>research / feature / …"]
+  S --> W[Work]
+  W --> D["Done-bar<br/>at exit"]
 ```
 
 | Profile | Cookbook |
@@ -134,115 +176,89 @@ flowchart LR
 | Accept / done bar | [`done-bar.md`](./cookbook/done-bar.md) |
 | Schema pin (no tip fetch) | [`schema-pinning.md`](./cookbook/schema-pinning.md) |
 | Manager/worker session shape | [`orchestrator-session.md`](./cookbook/orchestrator-session.md) |
-| Glass-box factory *pattern* (no CLI here) | [`glass-box-factory.md`](./cookbook/glass-box-factory.md) |
+| Glass-box factory *pattern* (no CLI in this repo) | [`glass-box-factory.md`](./cookbook/glass-box-factory.md) |
 
-Templates: [`templates/orientation.md`](./templates/orientation.md), [`templates/stream-pack.yaml`](./templates/stream-pack.yaml).
-
----
-
-## 60-second start (brownfield)
-
-1. Copy [`templates/minimal-map.yaml`](./templates/minimal-map.yaml) → `.aap/map.yaml` (or `map.yaml` / `docs/map.yaml`).
-2. Edit `self`, `layout`, and `nodes` for **your** tree (keep it sparse).
-3. Tell the agent: *read the local map first; do not preload AAP upstream docs.*
-4. A/B a real task: **no map** vs **map only**. If map doesn’t help → **shrink**, don’t add profiles.
-5. Only then optional profiles (hub / streams / done-bar).
-
-Pin this protocol by **tag or commit** (never floating `main` as a live fetch):
-
-```bash
-git clone --depth 1 --branch v0.2.1-prototype \
-  https://github.com/gitpash/agent-artifact-protocol.git /tmp/aap
-mkdir -p .aap && cp /tmp/aap/templates/minimal-map.yaml .aap/map.yaml
-# edit .aap/map.yaml — then work from YOUR repo, not /tmp/aap
-```
-
-Details: [`cookbook/schema-pinning.md`](./cookbook/schema-pinning.md), [`cookbook/brownfield-init.md`](./cookbook/brownfield-init.md).
-
-Init tooling (if you add any) MUST be explicit, additive, dry-run capable, human-reviewed — **never** silent overwrite of existing files.
+Stubs: [`templates/orientation.md`](./templates/orientation.md), [`templates/stream-pack.yaml`](./templates/stream-pack.yaml).
 
 ---
 
-## Core vs profile (don’t mix them up)
+## Core vs profile
 
 ```mermaid
 flowchart TB
-  subgraph core [CORE — required for Orientation]
-    C1[Map v2: workspace / self / nodes / layout]
-    C2[Disclosure law L0 → L3]
-    C3[Artifact envelope only if you claim Artifact addressability]
+  subgraph core ["CORE — required for Orientation"]
+    C1["Map v2: workspace / self / nodes / layout"]
+    C2["Disclosure law L0 → L3"]
   end
-  subgraph prof [PROFILES — optional cookbook]
-    P1[Stream packs · orientation · done-bar]
-    P2[Hub-umbrella teaching · schema-pinning]
-    P3[Orchestrator / glass-box patterns — no harness required]
+
+  subgraph cond ["CONDITIONAL — only if you claim it"]
+    C3["Artifact envelope<br/>(Artifact addressability)"]
   end
-  core -.->|do not promote into L0| prof
+
+  subgraph prof ["PROFILES — optional, never promoted into L0"]
+    P1["Stream packs · orientation · done-bar"]
+    P2["Hub-umbrella teaching · schema-pinning"]
+    P3["Orchestrator / glass-box patterns"]
+  end
+
+  core ~~~ cond
+  cond ~~~ prof
 ```
 
-| Layer | Required for Orientation? |
-|-------|---------------------------|
-| Map v2 + disclosure law | **Yes** |
-| Artifact envelope | Only if claiming Artifact addressability |
-| Stream packs / accept bars / orientation cards | **No** |
-| Thin runtime dispatcher (`AGENTS.md`-style) | **No** |
-| Multi-agent “teams” runtimes | **No** (one way to implement orchestrator shape) |
+| Also remember | |
+|---------------|--|
+| **`write` / `access`** | Coordination hints, **not** security. Enforcement = Git / CODEOWNERS / host / sandbox. |
+| **Thin dispatcher** (`AGENTS.md`-style bootstrap) | Profile / runtime policy — not Core MUST. |
+| **Multi-agent “teams”** | One possible impl of orchestrator shape — not required. |
 
-**`write` / `access` are coordination hints, not security.** Real enforcement = Git permissions, CODEOWNERS, host policy, sandbox.
+Default with no explicit mutating mode: **read/orient only** (no write grant).
 
 ---
 
-## Core vocabulary (short)
+## Vocabulary and conformance
 
 | Term | Meaning |
 |------|---------|
 | **Map** | Sparse description of the opened workspace |
 | **Node** | Direct hop to a related repo/product |
-| **Layout key** | `code`, `tests`, `artifacts`, `scratch`, … → path(s); extensions allowed |
-| **resourceRef** | Path string or `{ path, access?, description? }` (default access `read-write`) |
-| **Artifact** | Optional durable note (historical envelope separately versioned) |
-| **Profile** | Optional named elaboration — never mandatory L0 |
+| **self.parent** | Optional single navigation/container pointer (see SPEC) |
+| **Layout key** | `code`, `tests`, `artifacts`, `scratch`, … → path(s) |
+| **resourceRef** | Path string or `{ path, access?, description? }` |
+| **Artifact** | Optional durable note (envelope when claiming addressability) |
+| **Profile** | Optional cookbook elaboration — never mandatory L0 |
 
-Layout keys are **not** a natural-language task classifier. “Modernize the API” is chosen by the human/agent; AAP only says where `code` / `tests` live.
-
-Full rules: [`SPEC.md`](./SPEC.md).
-
----
-
-## Conformance (lightweight)
-
-| Label | Means |
-|-------|--------|
+| Conformance label | Means |
+|-------------------|--------|
 | **Orientation** | Discoverable sparse map; layout-based discovery possible |
-| **Artifact** | Durable notes use the envelope field set when claiming addressability |
+| **Artifact** | Envelope field set when claiming addressability |
 | **Topology** | Honest direct nodes and paths |
-| **Disclosure profile** *(optional)* | Streams / accept / thin orientation — **not** required for Orientation |
+| **Disclosure profile** *(optional)* | Streams / accept / thin orientation — not required for Orientation |
 
 ```bash
 pip install pyyaml jsonschema
 python scripts/validate.py
 ```
 
+This is a **convention + schemas**, not a complete cross-file protocol suite.
+
 ---
 
 ## What’s in this repository
 
 ```text
-README.md                 ← you are here
-SPEC.md                   # Map v2 Core (on demand — not L0)
-MOTIVATION.md
-CONTRIBUTING.md
-CHANGELOG.md
-schemas/                  # Map v2 JSON Schema
-legacy/v1/                # historical zones map
-templates/                # minimal-map, orientation, stream-pack, artifacts
-examples/                 # single-repo, shell, hub-umbrella, stream-packs, invalid
-cookbook/                 # optional profiles + patterns
+README.md SPEC.md MOTIVATION.md CONTRIBUTING.md CHANGELOG.md
+schemas/          # Map v2 JSON Schema
+legacy/v1/        # historical zones map
+templates/        # minimal-map, orientation, stream-pack, artifacts
+examples/         # single-repo, shell, hub-umbrella, stream-packs, invalid
+cookbook/         # optional profiles + patterns
 scripts/validate.py
 ```
 
 **Intentionally absent:** product adoption guides, pilot dashboards, runtime adapters, factory/conductor CLI, mandatory multi-agent harnesses.  
-See [`cookbook/what-not-to-copy.md`](./cookbook/what-not-to-copy.md).
+[`cookbook/what-not-to-copy.md`](./cookbook/what-not-to-copy.md).
+
+Init tooling, if you add any elsewhere, MUST be explicit, additive, dry-run capable, and human-reviewed — never silent overwrite ([`CONTRIBUTING.md`](./CONTRIBUTING.md), [`SPEC.md`](./SPEC.md)).
 
 ---
 
@@ -254,21 +270,14 @@ See [`cookbook/what-not-to-copy.md`](./cookbook/what-not-to-copy.md).
 | Evolves via tags | Local map + optional local profiles |
 | Not fetched every agent turn | L0 = **local** map only |
 
-```mermaid
-flowchart LR
-  U[gitpash/agent-artifact-protocol<br/>pin v0.2.1-prototype] -.->|copy templates once| Y[Your repo<br/>.aap/map.yaml]
-  Y --> AG[Agent session]
-  AG --> Y
-```
-
 ---
 
 ## Status
 
-**`0.2.1-prototype`** = experimental Map v2 Core **plus** a dogfood-informed **cookbook prototype**. Useful in multi-repo pilots. **Not** production infrastructure or a finished interoperability standard. Profiles do not make Core “stable.”
+**`0.2.1-prototype`** = experimental Map v2 Core **plus** a dogfood-informed cookbook. Aimed at multi-repo pilots; **not** production infrastructure or a finished interoperability standard. Profiles do not make Core stable.
 
-Map v2 landed in the `0.2.0-draft` lineage; this tag documents optional profiles on **that same Core** (schema required fields unchanged). v1 lives under `legacy/v1/`.
+Map v2 rules come from the `0.2.0-draft` lineage; this tag adds prototype **docs** on that Core (required schema fields unchanged). v1: `legacy/v1/`.
 
-Feedback welcome: map size, layout-key granularity, cross-runtime use without preload, whether Core is still too large, whether profiles stay optional in practice.
+Feedback: map size, layout-key granularity, cross-runtime use without preload, whether Core is still too large, whether profiles stay optional in practice.
 
-[`CONTRIBUTING.md`](./CONTRIBUTING.md) · [`CHANGELOG.md`](./CHANGELOG.md) · Issues/PRs welcome; prefer changes that keep L0 small.
+[`CONTRIBUTING.md`](./CONTRIBUTING.md) · [`CHANGELOG.md`](./CHANGELOG.md) · Issues/PRs welcome; keep L0 small.

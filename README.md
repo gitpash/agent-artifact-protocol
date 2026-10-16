@@ -52,6 +52,21 @@ flowchart LR
 
 ---
 
+## The protocol in three steps
+
+```mermaid
+flowchart LR
+  O[Orient] --> W[Work] --> D[Deposit]
+```
+
+1. **Orient** — read the local map (L0); pick a **layout** key or **node**.
+2. **Work** — any harness, skills, MCP, or humans; AAP does **not** prescribe how work is done.
+3. **Deposit** — durable results under layout **`artifacts`**; drafts under **`scratch`**; follow map rules (not random paths).
+
+**Core Orientation conformance requires only step 1**; steps 2–3 are **convention**, not conformance MUST.
+
+---
+
 ## How it works (Core)
 
 ### 1. One small map in *your* repo

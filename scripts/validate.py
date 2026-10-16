@@ -64,9 +64,13 @@ def main() -> None:
     print("OK schemas self-validate")
     map_validator = jsonschema.Draft7Validator(map_schema)
     envelope_validator = jsonschema.Draft7Validator(envelope_schema)
-    positives = [ROOT / "templates" / "minimal-map.yaml"] + sorted(
-        (ROOT / "examples").glob("*/map.yaml")
+    # templates + every examples/**/map.yaml except under examples/invalid/
+    example_maps = sorted(
+        path
+        for path in (ROOT / "examples").rglob("map.yaml")
+        if "invalid" not in path.relative_to(ROOT / "examples").parts
     )
+    positives = [ROOT / "templates" / "minimal-map.yaml"] + example_maps
     for path in positives:
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
         errors = list(map_validator.iter_errors(data)) + [Exception(error) for error in layout_path_errors(data)]

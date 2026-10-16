@@ -1,8 +1,8 @@
 # Agent Artifact Protocol (AAP)
 
-**Version:** 0.2.0-draft
-**Status:** experimental Map v2 proposal
-**License:** MIT
+**Version:** 0.2.0-draft  
+**Status:** experimental Map v2 + dogfood-informed **optional** profiles (cookbook)  
+**License:** MIT  
 **Git tag form:** `v0.2.0-draft` (documents omit the `v` prefix)
 
 > **AAP makes repository context addressable without requiring repository context to be loaded.**
@@ -11,12 +11,12 @@
 
 AAP is a **runtime-agnostic filesystem convention** for:
 
-1. **Repository orientation** — a tiny map using **layout categories** → zone → directory root  
+1. **Repository orientation** — a tiny map using **layout categories** → directory root  
 2. **Optional durable memory** — typed Markdown (or profile-defined) artifacts with a small envelope  
 
 It is **not** a context engine, RAG stack, agent harness, security sandbox, or mandatory preload pack.
 
-In v0.1, an “intent” is a **small vocabulary key** such as `code`, `tests`, `artifacts`, or `scratch` — **not** a natural-language task classifier. AAP does not understand phrases like “modernize the API” by itself; the agent (or human) picks a layout key and looks under that root.
+In v0.2, a layout key is a **small vocabulary key** such as `code`, `tests`, `artifacts`, or `scratch` — **not** a natural-language task classifier. AAP does not understand phrases like “modernize the API” by itself; the agent (or human) picks a layout key and looks under that root.
 
 Philosophy (aligned with formats like [Memoryfield](https://github.com/calpaterson/memoryfield-spec)):
 
@@ -31,10 +31,12 @@ Philosophy (aligned with formats like [Memoryfield](https://github.com/calpaters
 
 | Level | What | When |
 |-------|------|------|
-| **L0** | Map only | Session / workspace start |
-| **L1** | Optional zone index | After choosing a zone |
+| **L0** | Map only | Session / workspace start (**Orientation conformance**) |
+| **L1** | Targeted path or layout index | After choosing a layout key or node |
 | **L2** | One artifact | When durable memory is needed |
-| **L3** | Code + `grep` / LSP / indexes | Implementation — outside AAP |
+| **L3** | Code + normal tools (`grep` / LSP / indexes) | Implementation — outside AAP |
+
+**Optional profile bootstrap (not Core L0):** some deployments also open a thin orientation card and **exactly one** task-class stream pack after the map. That is **consumer/runtime policy**. It does **not** redefine L0 and **MUST NOT** become “read the whole cookbook every session.”
 
 **MUST NOT:** force agents to load this whole repository, the full SPEC, or an artifact corpus into the model context to begin work.
 
@@ -49,6 +51,7 @@ Philosophy (aligned with formats like [Memoryfield](https://github.com/calpaters
 2. Edit `self`, direct `nodes`, and `layout` paths to match **your** repository (keep it sparse).
 3. Tell the agent: *read the map first; do not preload AAP upstream docs.*
 4. Compare on a real task: **no map** vs **map only**.
+5. **Optional profiles** (after the map-only experiment helps): multi-repo shell → [`cookbook/hub-umbrella.md`](./cookbook/hub-umbrella.md); session procedure → [`cookbook/stream-packs.md`](./cookbook/stream-packs.md) + [`cookbook/local-bootstrap.md`](./cookbook/local-bootstrap.md).
 
 For editor/CI validation, pin this repository by immutable tag or commit. `schemas/map.schema.json` is the current v2 contract; do not validate against a floating branch tip. Validation is never required for L0 orientation.
 
@@ -76,13 +79,38 @@ schemas/                  # current Map v2 schema
 legacy/v1/                # historical v1 zones schema and examples
 templates/
 examples/
-  single-repo/ shell/ resource-ref/ invalid/
+  single-repo/ shell/ hub-umbrella/ resource-ref/
+  stream-packs/           # optional profile samples (not Core maps)
+  invalid/
 cookbook/
+  brownfield-init.md
+  hub-umbrella.md
+  stream-packs.md
+  local-bootstrap.md
+  what-not-to-copy.md
 scripts/validate.py
 .github/workflows/validate.yml
 ```
 
-**Not in this seed (on purpose):** product adoption guides, pilot metrics, partner-repo contracts, agent runtime adapters, CLI.
+**Not in this seed (on purpose):** product adoption guides, pilot metrics, partner-repo contracts, agent runtime adapters, CLI, orchestrator harnesses.
+
+---
+
+## Core vs profile
+
+| Layer | In tree | Required for Orientation? |
+|-------|---------|---------------------------|
+| Map v2 (`workspace` / `self` / `nodes` / `layout`) | Yes | **Yes** |
+| Progressive disclosure law (L0 map → … → L3 tools) | Yes | **Yes** (behavior) |
+| Artifact envelope (historical draft) | Yes | Only if claiming Artifact addressability |
+| `brownfield-artifacts` profile | SPEC prose | **No** |
+| Stream packs / accept bars / orientation cards | Cookbook + examples | **No** (Profile) |
+| Thin runtime dispatcher (`AGENTS.md` / local bootstrap) | Cookbook only | **No** (Profile) |
+| Multi-repo hub-umbrella teaching pattern | Cookbook + examples | **No** (pattern on Core maps) |
+| Orchestrator / factory / multi-agent session stories | Out of Core | **No** |
+
+**Core** stays small: sparse maps + disclosure law + optional artifact envelope.  
+**Profiles** are optional elaborations documented in the cookbook. They **MUST NOT** be treated as a mandatory first-read corpus.
 
 ---
 
@@ -92,10 +120,11 @@ scripts/validate.py
 |------|---------|
 | **Map** | Sparse description of the opened workspace, its layout, and direct navigation nodes |
 | **Node** | Direct navigational hop to a related repository/product; not a dependency declaration |
-| **Layout key** | `code`, `tests`, `artifacts`, `scratch`, … → resource reference(s) |
+| **Layout key** | `code`, `tests`, `artifacts`, `scratch`, … → resource reference(s); extensions allowed |
 | **resourceRef** | A relative path string or `{ path, access?, description? }`; default access is `read-write` |
 | **Artifact** | Optional durable note; the historical v1 envelope remains separately versioned |
 | **Write / access** | Advisory coordination metadata, never access control |
+| **Profile** | Optional named elaboration (streams, accept bar, brownfield-artifacts, …) — not Core L0 |
 
 ### `write` is not security
 
@@ -125,6 +154,7 @@ Full rules: [`SPEC.md`](./SPEC.md).
 | **Orientation** | A discoverable sparse map exists; agents may use layout-based discovery |
 | **Artifact** | Durable notes use the envelope field set when claiming AAP addressability |
 | **Topology** | A workspace map lists honest direct navigation nodes and paths |
+| **Disclosure profile** *(optional)* | Consumer adds stream packs / accept bars / thin orientation — **not** required for Orientation |
 
 This draft is a **convention + schemas**, not a complete cross-file protocol suite. Schema does not yet prove zone membership of every path, unique ids across a corpus, etc.
 
@@ -142,6 +172,7 @@ python scripts/validate.py
 | Spec + templates + examples | **Pinned** copy or reference by tag |
 | Evolves via semver / tags | Local `map.yaml` + local artifacts |
 | Not fetched on every agent turn | L0 = local map only |
+| Cookbook profiles | Opt-in local files (often gitignored) |
 
 Pin by **tag or commit**. Do not treat `main` as a live runtime dependency.
 
@@ -156,11 +187,13 @@ B) agent with map only   (no SPEC dump)
 
 If B does not improve time-to-locus / wrong-home rate, **shrink** the map — do not add schemas and profiles first.
 
+Only after B helps, try optional profiles (one stream pack, hub umbrella, accept bar).
+
 ---
 
 ## Status
 
-`0.2.0-draft` — experimental Map v2 blueprint. **Not** production infrastructure or a finished interoperability standard.
+`0.2.0-draft` — experimental Map v2 blueprint with a **dogfood-informed cookbook**. Useful in multi-repo pilots. **Not** production infrastructure or a finished interoperability standard. Core remains draft; optional profiles do not promote Core to stable.
 
 Feedback is especially welcome on:
 
@@ -168,5 +201,6 @@ Feedback is especially welcome on:
 - whether layout keys are the right granularity  
 - interoperability across agent runtimes without preload  
 - whether Core is still too large  
+- whether optional profiles stay clearly optional in practice  
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md). Issues and PRs welcome; prefer proposals that keep L0 small.

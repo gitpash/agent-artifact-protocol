@@ -1,0 +1,19 @@
+# Optional accept bar — run before claiming done / ship / PR-ready.
+# Not a Map v2 document. Not required for Orientation conformance.
+id: accept-default
+summary: Honesty bar shared across stream packs
+steps:
+  - id: orient
+    check: Map was read this session; active node or layout home is stated when relevant
+  - id: evidence
+    check: Factual claims cite paths, git, or command output — not vibes
+  - id: degrade
+    check: Missing optional indexes or tools were degraded explicitly (not silently ignored)
+  - id: write-home
+    check: Durable writes used layout write-home rules; no invented parallel roots
+  - id: checks
+    check: When a PR or ship claim exists, CI/check status is reported pass/fail/skip(reason)
+forbid:
+  - Claiming PR-ready or ship-ready on red required checks
+  - Evidence-free BLOCKER as a substitute for investigation
+  - Treating this bar as Core L0 mandatory for map-only repos

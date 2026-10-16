@@ -1,8 +1,8 @@
 # AAP Map v2 Specification
 
-**Name:** Agent Artifact Protocol (AAP)
-**Kind:** filesystem convention + JSON Schema
-**Version:** 0.2.0-draft
+**Name:** Agent Artifact Protocol (AAP)  
+**Kind:** filesystem convention + JSON Schema  
+**Version:** 0.2.0-draft  
 **Status:** experimental
 
 AAP makes repository context addressable without requiring it to be loaded. It is a small, runtime-agnostic navigation convention for repositories and optional durable artifacts. It is not a context engine, agent framework, retrieval protocol, dependency graph, or authorization system.
@@ -23,8 +23,9 @@ nodes: []
 - `self` describes its repository. `self.parent`, when present, is one bounded navigation/container pointer; it does not imply ownership, authorization, dependency, inherited policy, or recursive traversal.
 - `nodes` are direct navigational hops to related repositories or products, not a dependency graph.
 - `locator` identifies a node independently of a local checkout; `map` points at its map when deeper inspection is needed.
-- `layout` maps fixed vocabulary keys (`code`, `tests`, `artifacts`, `scratch`, and extensions) to directory roots in the current workspace.
-- `overlays.nodes` is optional machine-local checkout GPS. An overlay resolves navigation only and never grants write authority.
+- `layout` maps vocabulary keys to directory roots in the current workspace (see below).
+- `overlays` is optional machine-local checkout GPS (see **Overlays**).
+- `profiles` is an optional free-form enable list (see **Profiles block**).
 
 The normative schema is [`schemas/map.schema.json`](./schemas/map.schema.json). Consumers pin a release tag or commit; ordinary sessions read the local map rather than fetching upstream.
 
@@ -51,6 +52,54 @@ layout:
 
 `write` on a node is an optional, deployment-defined role hint. It is separate from path access and does not grant filesystem permission. Git permissions, CODEOWNERS, protected branches, and sandboxes enforce real boundaries.
 
+### Extension layout keys
+
+Core documents common keys (`code`, `tests`, `artifacts`, `scratch`, plus seed examples such as `scripts`, `infra`, `devops`). The schema **allows additional layout keys**; each value remains a `resourceRef` (or list of them).
+
+Extension keys:
+
+- **MAY** name local placement roots (`surfaces`, `verify`, …) when a team needs them.
+- **SHOULD** stay sparse and path-shaped — not procedure essays or tool catalogs.
+- **MUST NOT** be required for Orientation conformance in other repositories.
+- Do not treat an extension key as a natural-language intent router.
+
+Repository validators MAY constrain which extension keys are allowed locally; Core does not.
+
+## Overlays
+
+`overlays` (on the map) and the preferred gitignored sibling `map.local.yaml` supply **machine-local navigation GPS** only.
+
+```yaml
+# Prefer gitignored map.local.yaml so absolute checkouts never fork the shared map.
+overlays:
+  nodes:
+    orders-api: { path: /Users/you/src/orders-api }
+  # local_paths: alternate GPS shape allowed by schema
+```
+
+Rules:
+
+- Overlays resolve **where a node is checked out on this machine**.
+- Overlays **never** grant write authority and **MUST NOT** override `access` / write-home selection.
+- Committed maps **SHOULD** avoid absolute paths; put GPS in a gitignored local file.
+- Consumers MAY extend a local file with non-schema profile indexes (stream catalogs, orientation pointers). Those keys are **not** part of Map v2 Core validation — see cookbook [`local-bootstrap.md`](./cookbook/local-bootstrap.md).
+
+## Profiles block
+
+The schema allows an optional top-level `profiles` object:
+
+```yaml
+profiles:
+  enabled:
+    - brownfield-artifacts
+    - feature-surface   # free-form local name — not a Core registry
+```
+
+- `profiles.enabled` is a list of **strings**. Core does not define a closed registry of names.
+- Enabled entries are **hints** for humans and local tooling; they do not change map validity by themselves.
+- Named behaviors (brownfield artifacts, stream packs, done-bar, …) live in SPEC prose or the **cookbook** as optional profiles.
+- Enabling a profile **MUST NOT** expand Core L0: agents still start from the map unless a **consumer runtime** chooses a stricter bootstrap.
+
 ## Brownfield artifacts profile
 
 `brownfield-artifacts` is an optional profile for repositories with a legacy documentation corpus:
@@ -61,6 +110,21 @@ layout:
 4. Typos or urgent factual corrections may be fixed in place without making the old root a home for new durable documents.
 
 This profile does not reserve path names or mandate a migration date.
+
+## Optional local files (non-normative)
+
+These files **MAY** exist beside a map. They are **not** required for map validity or Orientation conformance:
+
+| File | Role |
+|------|------|
+| `map.local.yaml` (often gitignored) | Machine GPS (`overlays`) and optional profile index |
+| Thin orientation card (e.g. `.aap/local/orientation.md`) | Short workspace card after the map |
+| Stream packs (e.g. `.aap/local/streams/*.yaml`) | One task-class procedure pack per session |
+| Accept bar (e.g. `_accept-default.yaml`) | Honesty checks before “done” / PR-ready |
+| Runtime dispatcher (`AGENTS.md` / local equivalent) | Harness-injected thin bootstrap — runtime policy |
+
+Documented shapes: [`cookbook/local-bootstrap.md`](./cookbook/local-bootstrap.md), [`cookbook/stream-packs.md`](./cookbook/stream-packs.md).  
+**MUST NOT** treat these as a mandatory preload corpus for Core.
 
 ## Artifacts
 
@@ -76,6 +140,8 @@ Artifacts remain optional Markdown (or profile-defined) durable units. The exist
 | L3 | code and normal tools | implementation evidence |
 
 Maps should stay sparse. Essays, whole corpora, graph indexes, embeddings, adapters, and workflow machinery do not belong in the mandatory L0 read.
+
+Core levels are **only** L0–L3. Additional labels used by a deployment (orientation cards, stream packs, capability files) are **profile elaborations** of the same law — they do not rename or replace Core levels.
 
 ## Versioning and migration
 

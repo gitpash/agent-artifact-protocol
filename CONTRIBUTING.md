@@ -16,10 +16,26 @@ Thank you for helping keep the Core **small**.
 | Map v2 discovery + layout intents | Natural-language task routing |
 | `resourceRef` path/access shape | Repository-specific legacy path rules |
 | Historical envelope draft | New mandatory artifact placement metadata without evidence |
-| Progressive disclosure rules | Runtime adapters (Claude, CI bots) |
+| Progressive disclosure rules | Runtime adapters (editor packs, CI bots, desktop harnesses) |
 | `write` / `access` as **hints** | Real ACL / auth systems |
 | Deployment-defined mode labels | Universal role vocabulary |
 | Schema shape validation | Cross-file linters beyond seed |
+| | **Stream packs**, **accept / done bars**, **orientation cards**, **local dispatcher** templates |
+| | Hub-umbrella teaching, glass-box factory *pattern*, orchestrator-session *shape* |
+| | Schema-pinning ops notes, brownfield init prose |
+
+### Profile PRs are not Core MUST
+
+Pull requests that add or edit:
+
+- stream pack samples / templates  
+- accept-default / done-bar checklists  
+- thin orientation cards  
+- factory or multi-agent session **stories**  
+
+…are **profile / cookbook** changes. Reviewers **MUST NOT** treat them as new Orientation requirements or as justification to grow mandatory L0. Optional profiles stay optional even when examples look polished.
+
+Prefer: cookbook page starts with *“Optional profile — not required for Orientation conformance.”*
 
 ## Proposing a Core change
 
@@ -33,9 +49,13 @@ Open an issue or PR that includes:
 6. **Schema or example diff**  
 7. At least one **invalid** case if adding a restriction  
 
+If the answer to (2) is “cookbook is enough,” ship a profile PR instead.
+
 ## L0 budget
 
 If your change requires agents to read more than the local map at session start, it is probably wrong for Core.
+
+**Reminder:** profile bootstrap (orientation card + one stream pack + done bar) is **consumer/runtime policy**. Document it in the cookbook; do **not** redefine Core L0 as “map + packs” in SPEC MUST language without an explicit, evidence-gated Core revision.
 
 ## Validation
 

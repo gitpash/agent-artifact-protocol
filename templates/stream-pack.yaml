@@ -1,0 +1,25 @@
+# Optional stream pack stub — not a Map v2 document.
+# Copy into a local path such as .aap/local/streams/<id>.yaml
+# Open exactly ONE pack per session. Not required for Orientation conformance.
+id: research
+summary: Domain answers from map + evidence
+when:
+  - where is
+  - blast radius
+  - investigate
+read_first:
+  - .aap/map.yaml
+open_when_needed: []
+tools:
+  rules:
+    - Prefer map hops before wide repository search
+    - If optional index or retrieval tool is empty → degrade; say so
+process:
+  - State question and candidate nodes
+  - Cite paths for factual claims
+acceptance:
+  - Claims tied to file or git evidence
+forbid:
+  - Preload full constitution or skill catalogs
+  - Open every stream pack in one session
+# Companion done bar (optional): see templates path or examples/stream-packs/streams/_accept-default.yaml

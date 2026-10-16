@@ -65,7 +65,7 @@ Samples: [`examples/stream-packs/`](../examples/stream-packs/).
 
 ## Accept bar (companion)
 
-Optional `_accept-default.yaml`: steps before claiming done / PR-ready (orient, evidence, no ship on failing checks). Encode honesty without growing the L0 map. A fuller “done-bar” cookbook page may land later; the sample accept file is enough to copy the idea.
+Optional `_accept-default.yaml`: steps before claiming done / PR-ready (orient, evidence, no ship on failing checks). Encode honesty without growing the L0 map. Full pattern: [`done-bar.md`](./done-bar.md). Sample: [`examples/stream-packs/streams/_accept-default.yaml`](../examples/stream-packs/streams/_accept-default.yaml). Stub: [`templates/stream-pack.yaml`](../templates/stream-pack.yaml).
 
 ## Runtime note
 
@@ -76,7 +76,15 @@ See [`local-bootstrap.md`](./local-bootstrap.md).
 ## Anti-patterns
 
 - Putting stream catalogs into committed `map.yaml` as mandatory Core fields  
-- Opening all packs “just in case”  
+- Opening all packs “just in case” — see [`examples/invalid/anti-multi-stream-open.md`](../examples/invalid/anti-multi-stream-open.md)  
 - Naming vendor-specific tool ids in shared examples as if required  
 - Treating stream packs as a replacement for the map  
 - Redefining Core L0 as “map + every pack”  
+
+## See also
+
+- [`done-bar.md`](./done-bar.md)  
+- [`local-bootstrap.md`](./local-bootstrap.md)  
+- [`templates/orientation.md`](../templates/orientation.md)  
+- [`templates/stream-pack.yaml`](../templates/stream-pack.yaml)  
+ 

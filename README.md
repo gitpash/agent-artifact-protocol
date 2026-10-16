@@ -17,7 +17,14 @@ AAP is a **runtime-agnostic filesystem convention**: a tiny map in the repo so a
 | Path **`access`** fences + optional node **`write`** role hints (coordination only) | Security sandbox or ACL |
 | Pinned templates you copy once | Something fetched every agent turn |
 
-**AAP does not replace `AGENTS.md` / `CLAUDE.md`:** those say *how to work*; the map says *where things are*. They can live side by side.
+The map is checked against **JSON Schema by a validator in CI**, so structure drift is caught by machine—not only by human review. That is a key difference from free-form orientation markdown.
+
+### How this relates to
+
+- **`AGENTS.md` / `CLAUDE.md`** — how to work vs where things are; orthogonal, can live side by side.
+- **llms.txt-style indexes** — discovery lists of docs/URLs; AAP is a sparse layout/hop map, not a content catalog. Can coexist.
+- **Repo-map style tools** — often generate or search structural overviews; AAP is a checked-in, schema-validated convention agents open first. Orthogonal.
+- **Agent skills** — procedural how-to packs; AAP does not define skills and does not replace them.
 
 ---
 

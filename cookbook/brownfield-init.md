@@ -1,5 +1,7 @@
 # Cookbook: brownfield init
 
+> **Profile status:** pending author
+
 ## Goal
 
 Add AAP orientation to an existing repo **without** rewriting its docs system.

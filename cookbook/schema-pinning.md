@@ -1,5 +1,7 @@
 # Cookbook: schema pinning
 
+> **Profile status:** used in practice
+
 > **Consumer ops guidance — not a new Core schema feature.**  
 > Keeps validators honest when upstream evolves.
 

@@ -6,8 +6,9 @@ Thank you for helping keep the Core **small**.
 
 | Place | Form |
 |-------|------|
-| Documents / CHANGELOG | `0.2.0-draft` (no `v`) |
-| Git tags | `v0.2.0-draft` (with `v`) |
+| Documents / CHANGELOG | `0.2.1-prototype` (no `v`) |
+| Git tags | `v0.2.1-prototype` (with `v`) |
+| Prior Core intro label | `0.2.0-draft` / historical commits — Map v2 rules unchanged in `0.2.1-prototype` |
 
 ## What belongs in Core vs elsewhere
 

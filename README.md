@@ -1,13 +1,13 @@
 # Agent Artifact Protocol (AAP)
 
-**Version:** 0.2.0-draft  
-**Status:** experimental Map v2 + dogfood-informed **optional** profiles (cookbook)  
+**Version:** 0.2.1-prototype  
+**Status:** experimental Map v2 Core + dogfood-informed **optional** profiles (working-prototype **docs**)  
 **License:** MIT  
-**Git tag form:** `v0.2.0-draft` (documents omit the `v` prefix)
+**Git tag form:** `v0.2.1-prototype` (documents omit the `v` prefix)
 
 > **AAP makes repository context addressable without requiring repository context to be loaded.**
 
-> **Breaking draft revision.** `0.2.0-draft` replaces the historical v1 `zones` map with a repository-oriented v2 `workspace` / `self` / `nodes` map. The v1 material is retained under `legacy/v1/` for historical reference and is not compatible with v2.
+> **Map v2** (`0.2.0-draft` lineage) replaced the historical v1 `zones` map with a repository-oriented `workspace` / `self` / `nodes` map. **`0.2.1-prototype`** is a **docs/cookbook** label on that same Core — optional profiles and examples, **not** a claim that Core is a finished interop standard. v1 material remains under `legacy/v1/`.
 
 AAP is a **runtime-agnostic filesystem convention** for:
 
@@ -57,7 +57,7 @@ For editor/CI validation, pin this repository by immutable tag or commit (see [`
 
 ```bash
 # conceptual pin (no runtime fetch during normal agent sessions)
-# git clone --depth 1 --branch v0.2.0-draft \
+# git clone --depth 1 --branch v0.2.1-prototype \
 #   https://github.com/gitpash/agent-artifact-protocol.git /tmp/aap
 # mkdir -p .aap && cp /tmp/aap/templates/minimal-map.yaml .aap/map.yaml
 ```
@@ -203,9 +203,7 @@ Only after B helps, try optional profiles (one stream pack, hub umbrella, accept
 
 ## Status
 
-`0.2.0-draft` — experimental Map v2 blueprint with a **dogfood-informed cookbook**. Useful in multi-repo pilots. **Not** production infrastructure or a finished interoperability standard. Core remains draft; optional profiles do not promote Core to stable.
-
-**Prototype narrative (docs only):** Unreleased cookbook work prepares a possible later `0.2.1-prototype` **docs** label (see CHANGELOG candidate notes). That is **not** a claim that Core is stable, and **no** prototype git tag is cut from cookbook PRs alone.
+`0.2.1-prototype` — experimental Map v2 Core **plus** a dogfood-informed **cookbook prototype** (hub umbrella, stream packs, local bootstrap, done-bar, schema pinning, session patterns). Useful in multi-repo pilots. **Not** production infrastructure or a finished interoperability standard. Optional profiles do **not** promote Core to stable; pin with git tag `v0.2.1-prototype` (or commit SHA).
 
 Feedback is especially welcome on:
 

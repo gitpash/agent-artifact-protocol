@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+(nothing yet)
+
+## 0.2.1-prototype — 2026-10-16
+
+**Docs / cookbook prototype label.** Map v2 **Core schema and required fields are unchanged** from `0.2.0-draft`. This release makes optional profiles and teaching materials legible. It is **not** a finished interoperability standard and does **not** mark Core stable.
+
 ### Added
 
 - Cookbook: `hub-umbrella.md`, `stream-packs.md`, `local-bootstrap.md` (optional profiles / teaching patterns)
@@ -9,7 +15,7 @@
 - Examples: `examples/hub-umbrella/` (synthetic multi-node shell + child map), `examples/stream-packs/` (orientation, local index example, research / release-check / accept-default samples)
 - Examples: `examples/invalid/anti-multi-stream-open.md`, `anti-recursive-preload.md` (disclosure anti-patterns); `examples/shell/README.md` cross-link to hub-umbrella
 - Templates: `templates/orientation.md`, `templates/stream-pack.yaml` stubs
-- README: Core vs profile table; progressive disclosure footnote that profile bootstrap is not Core L0; links to new cookbook pages and templates; optional **Disclosure profile** conformance row; prototype-narrative note (unreleased)
+- README: Core vs profile table; progressive disclosure footnote that profile bootstrap is not Core L0; links to new cookbook pages and templates; optional **Disclosure profile** conformance row
 - SPEC: overlays, extension layout keys, optional `profiles` block, non-normative optional local files (schema-preexisting surfaces; prose only)
 - MOTIVATION: experiment metrics sketch (wrong-home, index degrade honesty, accept-bar catches)
 - CONTRIBUTING: stream packs / accept bars / orientation templates are **profile PRs**, not Core MUST; L0 budget reminder for profile bootstrap
@@ -18,7 +24,7 @@
 
 - Core L0 remains map-only for Orientation conformance
 - Dogfood-inspired profiles (stream packs, thin orientation, accept bar, thin runtime dispatcher, done bar) are **optional**; no specific agent harness or multi-agent runtime is required
-- Status narrative: working-prototype cookbook alongside experimental Map v2 — still not a finished interop standard
+- Status narrative: working-prototype **docs** alongside experimental Map v2 Core
 - Glass-box factory and orchestrator session are **patterns** documented in cookbook — this repo does **not** ship conductor CLI
 - `what-not-to-copy.md`: factory/orchestrator/status-macro/dispatcher/index anti-copies; copy stream-pack, done-bar, and hub-umbrella **ideas**
 - Schema pinning: immutable tag/commit; MUST NOT validate against tip; dual gist vs in-repo honesty
@@ -26,33 +32,17 @@
 ### Not changed
 
 - Map v2 required fields and `resourceRef` semantics
-- Schema document version / git tag (`0.2.0-draft` / `v0.2.0-draft`)
 - Core size goals (profiles stay out of mandatory L0)
+- `schemas/map.schema.json` document shape (still the v2 contract introduced in `0.2.0-draft`)
 
-### Unreleased candidate notes (not tagged)
+### Git tag
 
-Draft text for a possible future **docs-only** `0.2.1-prototype` label — **candidate only**. Do **not** treat as released; **no** git tag from this changelog alone; Core remains experimental.
+- Documents / CHANGELOG: `0.2.1-prototype` (no `v`)
+- Git tag: `v0.2.1-prototype` (with `v`)
 
-```text
-## 0.2.1-prototype — (date TBD; unreleased candidate)
+## 0.2.0-draft — 2026-09-11
 
-### Added
-- Cookbook: hub umbrella, stream packs, local bootstrap, done-bar, schema-pinning,
-  glass-box-factory (pattern), orchestrator-session (optional profiles / patterns)
-- Examples: hub-umbrella, stream-packs samples; invalid disclosure anti-pattern notes
-- Templates: orientation.md, stream-pack.yaml stubs
-- SPEC clarifications: overlays, extension layout keys, profiles block (schema-preexisting)
-
-### Clarified
-- Core L0 remains map-only for Orientation conformance
-- Dogfood-inspired profiles are optional; multi-agent runtimes not required
-- Status: working-prototype docs; still not a finished interop standard
-
-### Not changed
-- Map v2 required fields / resourceRef semantics
-```
-
-## 0.2.0-draft — Unreleased
+Map v2 introduction (historical). Prefer pinning **`v0.2.1-prototype`** (or later) for docs+schema teaching set; Core map rules below still apply.
 
 ### Changed
 
@@ -88,17 +78,4 @@ Draft text for a possible future **docs-only** `0.2.1-prototype` label — **can
 
 ## 0.1.0-draft — 2026-09-08
 
-### Added
-
-- Initial public seed: README, SPEC, white paper outline, MIT license  
-- JSON Schemas: map + artifact envelope  
-- Templates: minimal map, capability + decision artifacts  
-- Examples: single-repo and multi-zone maps  
-- Cookbook: brownfield init, what not to copy from incubators  
-
-### Design stance
-
-- Progressive disclosure (L0 = map only)  
-- Zone = placement/coordination scope (ownership not implied)  
-- `write` allow-list may be empty; optional `access`  
-- External zones: schema-compatible, provisional, not required for Core orientation  
+Initial public draft (v1 zones map). Superseded by Map v2; see `legacy/v1/`.

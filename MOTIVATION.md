@@ -1,6 +1,6 @@
 # AAP Motivation (outline)
 
-**Status:** outline paired with Map v2 SPEC 0.2.0-draft
+**Status:** outline paired with Map v2 SPEC `0.2.1-prototype` (Core lineage `0.2.0-draft`)
 
 ---
 

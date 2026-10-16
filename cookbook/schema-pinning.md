@@ -81,6 +81,7 @@ Validation is **never** required for L0 orientation. Schema checks are for edito
 
 ## See also
 
+- [`ci-validation.md`](./ci-validation.md) — run pinned checks in CI on consumer maps  
 - [`brownfield-init.md`](./brownfield-init.md) — pin step during init  
 - [`README.md`](../README.md) — pin language in 60-second start  
 - [`CONTRIBUTING.md`](../CONTRIBUTING.md) — Core vs profile; L0 budget  

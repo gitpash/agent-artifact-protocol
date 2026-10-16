@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=../../schemas/map.schema.json
+# Fictional meta-repo shell. Names are synthetic teaching fixtures only.
+# Nodes = direct hops from THIS workspace (not a full dependency graph).
+version: 2
+workspace:
+  id: acme-platform
+  description: >
+    Fictional multi-repo shell for teaching hub orientation, parent hops,
+    layout extensions, and a read-only external node.
+self:
+  id: acme-platform
+  kind: repository
+  path: .
+  description: Fictional umbrella checkout root (not a real product).
+layout:
+  artifacts: docs/artifacts/
+  scratch: docs/scratch/
+  # Extension layout key — business/report artifacts (allowed by additionalProperties).
+  business: docs/business/
+  reports: docs/business/reports/
+nodes:
+  - id: orders-api
+    kind: repository
+    path: orders-api
+    description: Fictional orders domain service.
+    locator:
+      repo: example/acme-orders-api
+    map:
+      path: map.yaml
+    write:
+      - domain
+  - id: admin-web
+    kind: repository
+    path: admin-web
+    description: Fictional operator UI for the platform shell.
+    locator:
+      repo: example/acme-admin-web
+    map:
+      path: map.yaml
+    write:
+      - domain
+  - id: billing-worker
+    kind: repository
+    path: billing-worker
+    description: Fictional async billing / invoice worker.
+    locator:
+      repo: example/acme-billing-worker
+    map:
+      path: map.yaml
+    write:
+      - domain
+  - id: external-gateway
+    kind: external
+    description: >
+      Fictional partner edge gateway — consume-only external dependency;
+      this shell does not curate its tree.
+    locator:
+      repo: example/partner-external-gateway
+    access: read-only

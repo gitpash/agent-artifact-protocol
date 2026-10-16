@@ -71,28 +71,29 @@ self:
   #   id: my-hub
   #   path: ../..           # navigation only
 layout:
-  code: src/
+  code: src/                       # string ≡ { path: src/, access: read-write }
   tests: tests/
   artifacts:
     - path: docs/artifacts/
-      access: read-write      # path fence (default if omitted)
+      access: read-write           # same resourceRef shape; list allowed
   scratch: docs/scratch/
 nodes:
   - id: orders-api
     kind: repository
     path: services/orders
-    # access: read-only     # path fence on the hop
-    # write: [domain]       # optional role hint — not an ACL
+    # access: read-only            # optional path fence on the hop
+    # write: [domain]              # optional role hints — not an ACL
 ```
 
 | Piece | Role |
 |-------|------|
 | **workspace / self** | What you opened |
-| **self.parent** | Optional **one** navigation/container pointer (no ownership, auth, or recursive preload). Already in Map v2 schema/SPEC. |
-| **layout** | Keys (`code`, `tests`, `artifacts`, `scratch`, …) → `resourceRef`(s) |
+| **self.parent** | Optional **one** navigation/container pointer (no ownership, auth, or recursive preload) |
+| **layout** | Keys (`code`, `tests`, `artifacts`, `scratch`, …) → one or more **resourceRef**s |
 | **nodes** | Direct **navigation hops** — not a dependency graph |
-| **resourceRef.`access`** | `read-only` \| `read-write` on a **path** (string shorthand ≡ `read-write`). Coordination fence, **not** OS/Git/IAM. Write-home for a layout key = first ref whose access is not `read-only`. |
-| **node.`write`** | Optional deployment-defined **role hints** (e.g. `domain`). Separate from `access`; does **not** grant filesystem permission ([SPEC](./SPEC.md)). |
+| **resourceRef** | Path string **or** `{ path, access?, description? }` |
+| **`access`** | On a resourceRef or node hop: `read-only` \| `read-write` (default `read-write`). **Path coordination fence**, not OS/Git/IAM. When a layout key lists several refs, the durable place to write is the **first** whose `access` is not `read-only` (write-home — full rule in [SPEC](./SPEC.md)). |
+| **`write`** | On a **node** only: optional string list of deployment-defined **role hints** (e.g. `domain`). Separate from `access`; does **not** grant filesystem permission ([SPEC](./SPEC.md)). |
 
 Layout keys are **not** a natural-language task classifier. The human/agent chooses the task; AAP only says where `code` / `tests` live.
 
@@ -110,7 +111,7 @@ flowchart TD
   L1 --> L3
   L1 -.->|only if durable memory is needed| L2
   L2 -.-> L3
-  L0 -.->|optional — never part of L0| P
+  L0 -.->|optional profile| P
 ```
 
 | Level | What | When |
@@ -218,13 +219,13 @@ flowchart TB
   C3 ~~~ P1
 ```
 
-| Field / policy | Meaning |
-|----------------|---------|
-| **`access`** (on `resourceRef` / node path) | Path coordination fence: `read-only` \| `read-write` |
-| **`write`** (on node) | Optional role **hints** only — not a filesystem grant ([SPEC](./SPEC.md)) |
+| Also | |
+|------|--|
 | **Thin dispatcher** (`AGENTS.md`-style bootstrap) | Profile / runtime policy — not Core MUST |
 | **Multi-agent “teams”** | One possible impl of orchestrator shape — not required |
-| **Default agent posture** | Until the user/runtime **explicitly** enables a mutating mode, treat the session as **read/orient only** (no write grant). See [SPEC — `write` is not security](./SPEC.md). |
+| **Default session posture** | **Runtime recommendation, not a Core MUST:** until the user/runtime **explicitly** enables writes, prefer **read/orient only**. AAP cannot enforce this; sandboxes and Git permissions do. See [SPEC](./SPEC.md). |
+
+Field definitions for **`access`** / **`write`**: [How it works §1](#1-one-small-map-in-your-repo).
 
 ---
 
@@ -234,11 +235,9 @@ flowchart TB
 |------|---------|
 | **Map** | Sparse description of the opened workspace |
 | **Node** | Direct hop to a related repo/product |
-| **self.parent** | Optional single navigation/container pointer ([SPEC](./SPEC.md) / schema) |
-| **Layout key** | `code`, `tests`, `artifacts`, `scratch`, … → `resourceRef`(s) |
-| **resourceRef** | Path string or `{ path, access?, description? }` |
-| **access** | Path fence on a ref or hop |
-| **write** | Optional node role hints (not ACL) |
+| **self.parent** | Optional single navigation/container pointer ([SPEC](./SPEC.md)) |
+| **Layout key** | `code`, `tests`, `artifacts`, `scratch`, … → resourceRef(s) |
+| **resourceRef**, **`access`**, **`write`** | See [How it works §1](#1-one-small-map-in-your-repo) (canonical) |
 | **Artifact** | Optional durable note (envelope when claiming addressability) |
 | **Profile** | Optional cookbook elaboration — never mandatory L0 |
 
@@ -279,9 +278,9 @@ See [`cookbook/what-not-to-copy.md`](./cookbook/what-not-to-copy.md). For init-t
 
 **`0.2.1-prototype`** = experimental Map v2 Core (schema + validator) **plus** a dogfood-informed cookbook. Aimed at multi-repo pilots; **not** production infrastructure or a finished interoperability standard. Profiles do not make Core stable.
 
-Map v2 rules come from the `0.2.0-draft` lineage; this tag adds prototype **docs** on that Core (required schema fields unchanged — including existing `self.parent`, `access`, and node `write`). v1: `legacy/v1/`.
+Map v2 rules come from the `0.2.0-draft` lineage; this tag adds prototype **docs** on that Core. **Schema unchanged** relative to that lineage; optional fields such as `self.parent`, `access`, and node `write` already exist in Map v2 (they are not newly required). v1: `legacy/v1/`.
 
-Upstream is pinned by **tag/commit** into your repo; L0 stays the **local** map only (see 60-second start).
+Upstream is pinned by **tag/commit** into your repo; L0 stays the **local** map only (see 60-second start). Tag `v0.2.1-prototype` includes `templates/minimal-map.yaml`.
 
 Feedback: map size, layout-key granularity, cross-runtime use without preload, whether Core is still too large, whether profiles stay optional in practice.
 

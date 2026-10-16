@@ -1,216 +1,287 @@
 # Agent Artifact Protocol (AAP)
 
 **Version:** 0.2.1-prototype  
-**Status:** experimental Map v2 Core + dogfood-informed **optional** profiles (working-prototype **docs**)  
+**Status:** experimental prototype (docs + schema + validator)  
 **License:** MIT  
-**Git tag form:** `v0.2.1-prototype` (documents omit the `v` prefix)
+**Git tag:** [`v0.2.1-prototype`](https://github.com/gitpash/agent-artifact-protocol/releases/tag/v0.2.1-prototype)  
+(Documents omit the `v` prefix: `0.2.1-prototype`.)
 
 > **AAP makes repository context addressable without requiring repository context to be loaded.**
 
-> **Map v2** (`0.2.0-draft` lineage) replaced the historical v1 `zones` map with a repository-oriented `workspace` / `self` / `nodes` map. **`0.2.1-prototype`** is a **docs/cookbook** label on that same Core — optional profiles and examples, **not** a claim that Core is a finished interop standard. v1 material remains under `legacy/v1/`.
+AAP is a **runtime-agnostic filesystem convention**: a tiny map in the repo so agents (and humans) can **find the right place** without dumping the whole project into the prompt.
 
-AAP is a **runtime-agnostic filesystem convention** for:
+| AAP is | AAP is not |
+|--------|------------|
+| Sparse **map** + progressive disclosure | Context engine / RAG |
+| Optional **profiles** in the cookbook | Agent harness or multi-agent runtime |
+| Path **`access`** fences + optional node **`write`** role hints (coordination only) | Security sandbox or ACL |
+| Pinned templates you copy once | Something fetched every agent turn |
 
-1. **Repository orientation** — a tiny map using **layout categories** → directory root  
-2. **Optional durable memory** — typed Markdown (or profile-defined) artifacts with a small envelope  
-
-It is **not** a context engine, RAG stack, agent harness, security sandbox, or mandatory preload pack.
-
-In v0.2, a layout key is a **small vocabulary key** such as `code`, `tests`, `artifacts`, or `scratch` — **not** a natural-language task classifier. AAP does not understand phrases like “modernize the API” by itself; the agent (or human) picks a layout key and looks under that root.
-
-Philosophy (aligned with formats like [Memoryfield](https://github.com/calpaterson/memoryfield-spec)):
-
-- conventions over infrastructure  
-- discovery over preloading  
-- progressive disclosure over context dumping  
-- files over runtime dependencies  
+**AAP does not replace `AGENTS.md` / `CLAUDE.md`:** those say *how to work*; the map says *where things are*. They can live side by side.
 
 ---
 
-## Progressive disclosure
+## What problem is this for?
+
+Coding agents often fail on **orientation** and **context pollution**, not on “missing a wiki page.”
+
+| Failure | What happens | Addressed by |
+|---------|----------------|--------------|
+| Wrong home | Edits land in the wrong package or “docs that look related” | **Core** (layout) |
+| Preload bloat | Session opens constitutions, catalogs, every submodule map | **Core** (L0→L3) |
+| No GPS | Multi-repo: path ≠ GitHub name; no clear hop | **Core** (nodes) |
+| Fake confidence | “PR ready” with red CI / invented blockers | ***Profile*** ([done-bar](./cookbook/done-bar.md)) |
+
+**AAP’s bet** (thesis, not a measured claim here): a sparse map + disclosure beats a bigger prompt. See [`MOTIVATION.md`](./MOTIVATION.md); validate with a local A/B (below) before you expand.
+
+```mermaid
+flowchart LR
+  subgraph before [Without a map]
+    A[Agent starts] --> B["Read AGENTS.md / wiki,<br/>grep around"]
+    B --> C[Guess locus]
+    C --> D[Wrong home or wasted turns]
+  end
+
+  subgraph after [With AAP]
+    E[Agent starts] --> F[Read local map only]
+    F --> G[Pick layout key or node]
+    G --> H[Open one path / one pack]
+    H --> I[Code + normal tools]
+  end
+```
+
+---
+
+## How it works (Core)
+
+### 1. One small map in *your* repo
+
+Prefer `.aap/map.yaml` (also `map.yaml` or `docs/map.yaml`).
+
+```yaml
+version: 2
+workspace:
+  id: my-app
+  description: What this checkout is
+self:
+  id: my-app
+  kind: repository
+  path: .
+  # parent:                 # optional — see vocabulary
+  #   id: my-hub
+  #   path: ../..           # navigation only
+layout:
+  code: src/                       # string ≡ { path: src/, access: read-write }
+  tests: tests/
+  artifacts:
+    - path: docs/artifacts/
+      access: read-write           # same resourceRef shape; list allowed
+  scratch: docs/scratch/
+nodes:
+  - id: orders-api
+    kind: repository
+    path: services/orders
+    # access: read-only            # optional path fence on the hop
+    # write: [domain]              # optional role hints — not an ACL
+```
+
+| Piece | Role |
+|-------|------|
+| **workspace / self** | What you opened |
+| **self.parent** | Optional **one** navigation/container pointer (no ownership, auth, or recursive preload) |
+| **layout** | Keys (`code`, `tests`, `artifacts`, `scratch`, …) → one or more **resourceRef**s |
+| **nodes** | Direct **navigation hops** — not a dependency graph |
+| **resourceRef** | Path string **or** `{ path, access?, description? }` |
+| **`access`** | On a resourceRef or node hop: `read-only` \| `read-write` (default `read-write`). **Path coordination fence**, not OS/Git/IAM. When a layout key lists several refs, the durable place to write is the **first** whose `access` is not `read-only` (write-home — full rule in [SPEC](./SPEC.md)). |
+| **`write`** | On a **node** only: optional string list of deployment-defined **role hints** (e.g. `domain`). Separate from `access`; does **not** grant filesystem permission ([SPEC](./SPEC.md)). |
+
+Layout keys are **not** a natural-language task classifier. The human/agent chooses the task; AAP only says where `code` / `tests` live.
+
+### 2. Progressive disclosure
+
+```mermaid
+flowchart TD
+  L0["L0 — Map only<br/>(Orientation conformance)"]
+  L1["L1 — One layout path or node hop"]
+  L2["L2 — One durable artifact"]
+  L3["L3 — Code + grep / LSP / indexes<br/>(outside AAP)"]
+  P["Optional profile<br/>orientation + one stream pack"]
+
+  L0 --> L1
+  L1 --> L3
+  L1 -.->|only if durable memory is needed| L2
+  L2 -.-> L3
+  L0 -.->|optional profile| P
+```
 
 | Level | What | When |
 |-------|------|------|
-| **L0** | Map only | Session / workspace start (**Orientation conformance**) |
-| **L1** | Targeted path or layout index | After choosing a layout key or node |
-| **L2** | One artifact | When durable memory is needed |
-| **L3** | Code + normal tools (`grep` / LSP / indexes) | Implementation — outside AAP |
+| **L0** | Map only | Session start (**Orientation**) |
+| **L1** | One path or node hop | After choosing a key or node |
+| **L2** | One artifact | **Only if** durable memory is needed |
+| **L3** | Normal engineering tools | Implementation |
 
-**Optional profile bootstrap (not Core L0):** some deployments also open a thin orientation card and **exactly one** task-class stream pack after the map. That is **consumer/runtime policy**. It does **not** redefine L0 and **MUST NOT** become “read the whole cookbook every session.”
-
-**MUST NOT:** force agents to load this whole repository, the full SPEC, or an artifact corpus into the model context to begin work.
-
----
-
-## 60-second start (brownfield)
-
-1. Copy [`templates/minimal-map.yaml`](./templates/minimal-map.yaml) to **one** of:
-   - `.aap/map.yaml` (preferred)
-   - `map.yaml`
-   - `docs/map.yaml`
-2. Edit `self`, direct `nodes`, and `layout` paths to match **your** repository (keep it sparse).
-3. Tell the agent: *read the map first; do not preload AAP upstream docs.*
-4. Compare on a real task: **no map** vs **map only**.
-5. **Optional profiles** (after the map-only experiment helps): multi-repo shell → [`cookbook/hub-umbrella.md`](./cookbook/hub-umbrella.md); session procedure → [`cookbook/stream-packs.md`](./cookbook/stream-packs.md) + [`cookbook/local-bootstrap.md`](./cookbook/local-bootstrap.md); honesty exit → [`cookbook/done-bar.md`](./cookbook/done-bar.md). Stubs: [`templates/orientation.md`](./templates/orientation.md), [`templates/stream-pack.yaml`](./templates/stream-pack.yaml).
-
-For editor/CI validation, pin this repository by immutable tag or commit (see [`cookbook/schema-pinning.md`](./cookbook/schema-pinning.md)). `schemas/map.schema.json` is the current v2 contract; do not validate against a floating branch tip. Validation is never required for L0 orientation.
-
-```bash
-# conceptual pin (no runtime fetch during normal agent sessions)
-# git clone --depth 1 --branch v0.2.1-prototype \
-#   https://github.com/gitpash/agent-artifact-protocol.git /tmp/aap
-# mkdir -p .aap && cp /tmp/aap/templates/minimal-map.yaml .aap/map.yaml
-```
-
-Init tooling, if added later, MUST be **explicit**, **additive**, **dry-run capable**, and **human-reviewed**. It MUST NOT rewrite `CLAUDE.md` / `.specify/` / existing docs homes by default. **If a target file already exists, init MUST stop or require explicit per-file confirmation** — never silent overwrite.
-
----
-
-## Repository layout (this seed)
-
-```text
-README.md
-SPEC.md                   # Map v2 Core (on demand — not L0)
-MOTIVATION.md
-CONTRIBUTING.md
-LICENSE
-CHANGELOG.md
-schemas/                  # current Map v2 schema
-legacy/v1/                # historical v1 zones schema and examples
-templates/
-  minimal-map.yaml
-  orientation.md          # optional thin card stub
-  stream-pack.yaml        # optional pack stub
-  artifact-*.md
-examples/
-  single-repo/ shell/ hub-umbrella/ resource-ref/
-  stream-packs/           # optional profile samples (not Core maps)
-  invalid/                # schema fixtures + disclosure anti-pattern notes
-cookbook/
-  brownfield-init.md
-  hub-umbrella.md
-  stream-packs.md
-  local-bootstrap.md
-  done-bar.md
-  schema-pinning.md
-  glass-box-factory.md    # pattern only — no CLI in this repo
-  orchestrator-session.md # harness-agnostic manager/worker shape
-  what-not-to-copy.md
-scripts/validate.py
-.github/workflows/validate.yml
-```
-
-**Not in this seed (on purpose):** product adoption guides, pilot metrics dashboards, partner-repo contracts, agent runtime adapters, factory/conductor CLI, mandatory multi-agent harnesses.
-
----
-
-## Core vs profile
-
-| Layer | In tree | Required for Orientation? |
-|-------|---------|---------------------------|
-| Map v2 (`workspace` / `self` / `nodes` / `layout`) | Yes | **Yes** |
-| Progressive disclosure law (L0 map → … → L3 tools) | Yes | **Yes** (behavior) |
-| Artifact envelope (historical draft) | Yes | Only if claiming Artifact addressability |
-| `brownfield-artifacts` profile | SPEC prose | **No** |
-| Stream packs / accept bars / orientation cards | Cookbook + examples + templates | **No** (Profile) |
-| Thin runtime dispatcher (`AGENTS.md` / local bootstrap) | Cookbook only | **No** (Profile) |
-| Multi-repo hub-umbrella teaching pattern | Cookbook + examples | **No** (pattern on Core maps) |
-| Done bar / schema-pinning ops notes | Cookbook | **No** (Profile / ops) |
-| Orchestrator session / glass-box factory **patterns** | Cookbook only (no CLI shipped) | **No** |
-| Multi-agent “teams” runtimes | Out of tree | **No** (one possible impl of orchestrator shape) |
-
-**Core** stays small: sparse maps + disclosure law + optional artifact envelope.  
-**Profiles** are optional elaborations documented in the cookbook. They **MUST NOT** be treated as a mandatory first-read corpus.
-
----
-
-## Core ideas (short)
-
-| Term | Meaning |
-|------|---------|
-| **Map** | Sparse description of the opened workspace, its layout, and direct navigation nodes |
-| **Node** | Direct navigational hop to a related repository/product; not a dependency declaration |
-| **Layout key** | `code`, `tests`, `artifacts`, `scratch`, … → resource reference(s); extensions allowed |
-| **resourceRef** | A relative path string or `{ path, access?, description? }`; default access is `read-write` |
-| **Artifact** | Optional durable note; the historical v1 envelope remains separately versioned |
-| **Write / access** | Advisory coordination metadata, never access control |
-| **Profile** | Optional named elaboration (streams, accept bar, brownfield-artifacts, …) — not Core L0 |
-
-### `write` is not security
-
-```yaml
-# Coordination hint only — NOT access control / sandboxing.
-write: [maintainer]
-```
-
-AAP **cannot** prevent a human or agent from writing outside these paths. Real enforcement requires Git permissions, CODEOWNERS, host policy, or a runtime sandbox.
-
-If no active mutating mode is **explicitly** provided by the user/runtime, the default is **no write grant** (read/orient only).
-
-Core artifact `type` values: `capability` | `decision` | `contract` | `gotcha` | `impact`  
-Recommended stable ids use a namespace-like form such as `<zone>/<type>/<slug>`. Id uniqueness across a corpus is a tooling concern, not distributed allocation provided by Core.
-Extension types SHOULD use dots (`diagram.sequence`). The Core JSON Schema validates **envelope shape**; it does not fully police extension namespaces (repository validators MAY).
-
-External / cross-repo nodes are schema-compatible direct navigation hops; their write policy is deployment-specific.
+**MUST NOT:** force-load this upstream repo, the full SPEC, or an artifact corpus just to begin work.
 
 Full rules: [`SPEC.md`](./SPEC.md).
 
 ---
 
-## Conformance (lightweight)
+## 60-second start (brownfield)
 
-| Label | Means |
-|-------|--------|
-| **Orientation** | A discoverable sparse map exists; agents may use layout-based discovery |
-| **Artifact** | Durable notes use the envelope field set when claiming AAP addressability |
-| **Topology** | A workspace map lists honest direct navigation nodes and paths |
-| **Disclosure profile** *(optional)* | Consumer adds stream packs / accept bars / thin orientation — **not** required for Orientation |
+1. Copy [`templates/minimal-map.yaml`](./templates/minimal-map.yaml) → `.aap/map.yaml` (see pin snippet below).
+2. Edit `self`, `layout`, and `nodes` for **your** tree (keep it sparse).
+3. Tell the agent: *read the local map first; do not preload AAP upstream docs.*
+4. A/B a real task — **A: no map**, **B: map only**. If **B** does not help → **shrink the map**, do not add profiles.
+5. Only then optional profiles (hub / one stream pack / done-bar).
 
-This draft is a **convention + schemas**, not a complete cross-file protocol suite. Schema does not yet prove zone membership of every path, unique ids across a corpus, etc.
+**Pin** = which tag your copied templates came from. Nothing is fetched at agent runtime. Keep the pin visible in the map file:
+
+```bash
+git clone --depth 1 --branch v0.2.1-prototype \
+  https://github.com/gitpash/agent-artifact-protocol.git /tmp/aap
+mkdir -p .aap
+{
+  echo "# aap-pin: v0.2.1-prototype"
+  echo "# source: https://github.com/gitpash/agent-artifact-protocol"
+  cat /tmp/aap/templates/minimal-map.yaml
+} > .aap/map.yaml
+# edit .aap/map.yaml — work from YOUR repo, not /tmp/aap
+```
+
+YAML `#` comments do not affect schema validation. More detail: [`cookbook/schema-pinning.md`](./cookbook/schema-pinning.md), [`cookbook/brownfield-init.md`](./cookbook/brownfield-init.md).
+
+---
+
+## Multi-repo: hop, don’t preload
+
+```mermaid
+flowchart TB
+  H["Hub map<br/>workspace + nodes"]
+  H --> N1["node: orders-api<br/>path: services/orders"]
+  H --> N2["node: admin-web<br/>path: apps/admin"]
+  N1 --> C1["Child map optional"]
+  N2 --> C2["Child map optional"]
+  C1 -.->|self.parent| H
+  C2 -.->|self.parent| H
+```
+
+Nodes are **doors**, not “load every submodule into context.”  
+[`cookbook/hub-umbrella.md`](./cookbook/hub-umbrella.md) · [`examples/hub-umbrella/`](./examples/hub-umbrella/).
+
+---
+
+## Optional profiles (not Core L0)
+
+After map-only helps, you **may** add local procedure files (often gitignored):
+
+```mermaid
+flowchart LR
+  M["Map (L0)"] --> O["orientation.md<br/>thin card"]
+  O --> S["One stream pack<br/>research / feature / …"]
+  S --> W[Work]
+  W --> D["Done-bar<br/>at exit"]
+```
+
+| Profile | Cookbook |
+|---------|----------|
+| Stream packs (one task class per session) | [`stream-packs.md`](./cookbook/stream-packs.md) |
+| Thin orientation + local index | [`local-bootstrap.md`](./cookbook/local-bootstrap.md) |
+| Accept / done bar | [`done-bar.md`](./cookbook/done-bar.md) |
+| Schema pin (no tip fetch) | [`schema-pinning.md`](./cookbook/schema-pinning.md) |
+| Manager/worker session shape | [`orchestrator-session.md`](./cookbook/orchestrator-session.md) |
+| Glass-box factory *pattern* (no CLI in this repo) | [`glass-box-factory.md`](./cookbook/glass-box-factory.md) |
+
+Stubs: [`templates/orientation.md`](./templates/orientation.md), [`templates/stream-pack.yaml`](./templates/stream-pack.yaml).
+
+---
+
+## Core vs profile
+
+```mermaid
+flowchart TB
+  subgraph core ["CORE — required for Orientation"]
+    C1["Map v2: workspace / self / nodes / layout"]
+    C2["Disclosure law L0 → L3"]
+  end
+
+  subgraph cond ["CONDITIONAL — only if you claim it"]
+    C3["Artifact envelope<br/>(Artifact addressability)"]
+  end
+
+  subgraph prof ["PROFILES — optional, never promoted into L0"]
+    P1["Stream packs · orientation · done-bar"]
+    P2["Hub-umbrella teaching · schema-pinning"]
+    P3["Orchestrator / glass-box patterns"]
+  end
+
+  C2 ~~~ C3
+  C3 ~~~ P1
+```
+
+| Also | |
+|------|--|
+| **Thin dispatcher** (`AGENTS.md`-style bootstrap) | Profile / runtime policy — not Core MUST |
+| **Multi-agent “teams”** | One possible impl of orchestrator shape — not required |
+| **Default session posture** | **Runtime recommendation, not a Core MUST:** until the user/runtime **explicitly** enables writes, prefer **read/orient only**. AAP cannot enforce this; sandboxes and Git permissions do. See [SPEC](./SPEC.md). |
+
+Field definitions for **`access`** / **`write`**: [How it works §1](#1-one-small-map-in-your-repo).
+
+---
+
+## Vocabulary and conformance
+
+| Term | Meaning |
+|------|---------|
+| **Map** | Sparse description of the opened workspace |
+| **Node** | Direct hop to a related repo/product |
+| **self.parent** | Optional single navigation/container pointer ([SPEC](./SPEC.md)) |
+| **Layout key** | `code`, `tests`, `artifacts`, `scratch`, … → resourceRef(s) |
+| **resourceRef**, **`access`**, **`write`** | See [How it works §1](#1-one-small-map-in-your-repo) (canonical) |
+| **Artifact** | Optional durable note (envelope when claiming addressability) |
+| **Profile** | Optional cookbook elaboration — never mandatory L0 |
+
+| Conformance label | Means |
+|-------------------|--------|
+| **Orientation** | Discoverable sparse map; layout-based discovery possible |
+| **Artifact** | Envelope field set when claiming addressability |
+| **Topology** | Nodes are direct hops; listed paths are meant to resolve in the checkout |
+| **Disclosure profile** *(optional)* | Streams / accept / thin orientation — not required for Orientation |
 
 ```bash
 pip install pyyaml jsonschema
 python scripts/validate.py
 ```
 
----
-
-## Relationship to consumer repos
-
-| This repo (upstream) | Your product repo |
-|----------------------|-------------------|
-| Spec + templates + examples | **Pinned** copy or reference by tag |
-| Evolves via semver / tags | Local `map.yaml` + local artifacts |
-| Not fetched on every agent turn | L0 = local map only |
-| Cookbook profiles | Opt-in local files (often gitignored) |
-
-Pin by **tag or commit**. Do not treat `main` as a live runtime dependency.
+This is a **convention + schemas**, not a complete cross-file protocol suite.
 
 ---
 
-## Experiment before you expand
+## What’s in this repository
 
 ```text
-A) agent without map
-B) agent with map only   (no SPEC dump)
+README.md SPEC.md MOTIVATION.md CONTRIBUTING.md CHANGELOG.md
+schemas/          # Map v2 JSON Schema
+legacy/v1/        # historical zones map
+templates/        # minimal-map, orientation, stream-pack, artifacts
+examples/         # single-repo, shell, hub-umbrella, stream-packs, invalid
+cookbook/         # optional profiles + patterns
+scripts/validate.py
 ```
 
-If B does not improve time-to-locus / wrong-home rate, **shrink** the map — do not add schemas and profiles first.
-
-Only after B helps, try optional profiles (one stream pack, hub umbrella, accept bar).
+**Intentionally absent:** product adoption guides, pilot dashboards, runtime adapters, factory/conductor CLI, mandatory multi-agent harnesses.  
+See [`cookbook/what-not-to-copy.md`](./cookbook/what-not-to-copy.md). For init-tooling rules if you build any, see [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 ---
 
 ## Status
 
-`0.2.1-prototype` — experimental Map v2 Core **plus** a dogfood-informed **cookbook prototype** (hub umbrella, stream packs, local bootstrap, done-bar, schema pinning, session patterns). Useful in multi-repo pilots. **Not** production infrastructure or a finished interoperability standard. Optional profiles do **not** promote Core to stable; pin with git tag `v0.2.1-prototype` (or commit SHA).
+**`0.2.1-prototype`** = experimental Map v2 Core (schema + validator) **plus** a dogfood-informed cookbook. Aimed at multi-repo pilots; **not** production infrastructure or a finished interoperability standard. Profiles do not make Core stable.
 
-Feedback is especially welcome on:
+Map v2 rules come from the `0.2.0-draft` lineage; this tag adds prototype **docs** on that Core. **Schema unchanged** relative to that lineage; optional fields such as `self.parent`, `access`, and node `write` already exist in Map v2 (they are not newly required). v1: `legacy/v1/`.
 
-- map size and usefulness in brownfield repos  
-- whether layout keys are the right granularity  
-- interoperability across agent runtimes without preload  
-- whether Core is still too large  
-- whether optional profiles stay clearly optional in practice  
+Upstream is pinned by **tag/commit** into your repo; L0 stays the **local** map only (see 60-second start). Tag `v0.2.1-prototype` includes `templates/minimal-map.yaml`.
 
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md). Issues and PRs welcome; prefer proposals that keep L0 small.
+Feedback: map size, layout-key granularity, cross-runtime use without preload, whether Core is still too large, whether profiles stay optional in practice.
+
+[`CONTRIBUTING.md`](./CONTRIBUTING.md) · [`CHANGELOG.md`](./CHANGELOG.md) · Issues/PRs welcome; keep L0 small.

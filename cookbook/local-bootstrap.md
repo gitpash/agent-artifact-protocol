@@ -63,7 +63,8 @@ A short workspace card (on the order of ~10–20 lines), not a constitution dump
 
 **MUST NOT** replace the map or become a mandatory essay at L0 for Core conformance.
 
-Sample tone: [`examples/stream-packs/orientation.md`](../examples/stream-packs/orientation.md).
+Sample tone: [`examples/stream-packs/orientation.md`](../examples/stream-packs/orientation.md).  
+Copyable stub: [`templates/orientation.md`](../templates/orientation.md).
 
 ## Runtime dispatcher
 
@@ -78,7 +79,7 @@ That file is **runtime policy**. Soft “consider reading packs” guidance ofte
 
 ## Accept-default pattern
 
-Before claiming done / ship / PR-ready, walk a small checklist (orient, evidence for claims, honest degrade when indexes are empty, no green claim on failing checks). Sample: [`examples/stream-packs/streams/_accept-default.yaml`](../examples/stream-packs/streams/_accept-default.yaml).
+Before claiming done / ship / PR-ready, walk a small checklist (orient, evidence for claims, honest degrade when indexes are empty, no green claim on failing checks). Full pattern: [`done-bar.md`](./done-bar.md). Sample: [`examples/stream-packs/streams/_accept-default.yaml`](../examples/stream-packs/streams/_accept-default.yaml).
 
 ## Anti-patterns
 
@@ -87,10 +88,14 @@ Before claiming done / ship / PR-ready, walk a small checklist (orient, evidence
 - Orientation card that embeds full SPEC / skill catalogs  
 - Dispatcher that mandates SPEC + all packs every session  
 - Treating local bootstrap as universal AAP law  
+- Recursive child-map preload — [`examples/invalid/anti-recursive-preload.md`](../examples/invalid/anti-recursive-preload.md)  
 
 ## See also
 
 - [`stream-packs.md`](./stream-packs.md)  
+- [`done-bar.md`](./done-bar.md)  
+- [`schema-pinning.md`](./schema-pinning.md)  
 - [`hub-umbrella.md`](./hub-umbrella.md)  
 - [`what-not-to-copy.md`](./what-not-to-copy.md)  
 - [`brownfield-init.md`](./brownfield-init.md) — still ends at map-only experiment first  
+ 

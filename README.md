@@ -51,9 +51,9 @@ Philosophy (aligned with formats like [Memoryfield](https://github.com/calpaters
 2. Edit `self`, direct `nodes`, and `layout` paths to match **your** repository (keep it sparse).
 3. Tell the agent: *read the map first; do not preload AAP upstream docs.*
 4. Compare on a real task: **no map** vs **map only**.
-5. **Optional profiles** (after the map-only experiment helps): multi-repo shell → [`cookbook/hub-umbrella.md`](./cookbook/hub-umbrella.md); session procedure → [`cookbook/stream-packs.md`](./cookbook/stream-packs.md) + [`cookbook/local-bootstrap.md`](./cookbook/local-bootstrap.md).
+5. **Optional profiles** (after the map-only experiment helps): multi-repo shell → [`cookbook/hub-umbrella.md`](./cookbook/hub-umbrella.md); session procedure → [`cookbook/stream-packs.md`](./cookbook/stream-packs.md) + [`cookbook/local-bootstrap.md`](./cookbook/local-bootstrap.md); honesty exit → [`cookbook/done-bar.md`](./cookbook/done-bar.md). Stubs: [`templates/orientation.md`](./templates/orientation.md), [`templates/stream-pack.yaml`](./templates/stream-pack.yaml).
 
-For editor/CI validation, pin this repository by immutable tag or commit. `schemas/map.schema.json` is the current v2 contract; do not validate against a floating branch tip. Validation is never required for L0 orientation.
+For editor/CI validation, pin this repository by immutable tag or commit (see [`cookbook/schema-pinning.md`](./cookbook/schema-pinning.md)). `schemas/map.schema.json` is the current v2 contract; do not validate against a floating branch tip. Validation is never required for L0 orientation.
 
 ```bash
 # conceptual pin (no runtime fetch during normal agent sessions)
@@ -78,21 +78,29 @@ CHANGELOG.md
 schemas/                  # current Map v2 schema
 legacy/v1/                # historical v1 zones schema and examples
 templates/
+  minimal-map.yaml
+  orientation.md          # optional thin card stub
+  stream-pack.yaml        # optional pack stub
+  artifact-*.md
 examples/
   single-repo/ shell/ hub-umbrella/ resource-ref/
   stream-packs/           # optional profile samples (not Core maps)
-  invalid/
+  invalid/                # schema fixtures + disclosure anti-pattern notes
 cookbook/
   brownfield-init.md
   hub-umbrella.md
   stream-packs.md
   local-bootstrap.md
+  done-bar.md
+  schema-pinning.md
+  glass-box-factory.md    # pattern only — no CLI in this repo
+  orchestrator-session.md # harness-agnostic manager/worker shape
   what-not-to-copy.md
 scripts/validate.py
 .github/workflows/validate.yml
 ```
 
-**Not in this seed (on purpose):** product adoption guides, pilot metrics, partner-repo contracts, agent runtime adapters, CLI, orchestrator harnesses.
+**Not in this seed (on purpose):** product adoption guides, pilot metrics dashboards, partner-repo contracts, agent runtime adapters, factory/conductor CLI, mandatory multi-agent harnesses.
 
 ---
 
@@ -104,10 +112,12 @@ scripts/validate.py
 | Progressive disclosure law (L0 map → … → L3 tools) | Yes | **Yes** (behavior) |
 | Artifact envelope (historical draft) | Yes | Only if claiming Artifact addressability |
 | `brownfield-artifacts` profile | SPEC prose | **No** |
-| Stream packs / accept bars / orientation cards | Cookbook + examples | **No** (Profile) |
+| Stream packs / accept bars / orientation cards | Cookbook + examples + templates | **No** (Profile) |
 | Thin runtime dispatcher (`AGENTS.md` / local bootstrap) | Cookbook only | **No** (Profile) |
 | Multi-repo hub-umbrella teaching pattern | Cookbook + examples | **No** (pattern on Core maps) |
-| Orchestrator / factory / multi-agent session stories | Out of Core | **No** |
+| Done bar / schema-pinning ops notes | Cookbook | **No** (Profile / ops) |
+| Orchestrator session / glass-box factory **patterns** | Cookbook only (no CLI shipped) | **No** |
+| Multi-agent “teams” runtimes | Out of tree | **No** (one possible impl of orchestrator shape) |
 
 **Core** stays small: sparse maps + disclosure law + optional artifact envelope.  
 **Profiles** are optional elaborations documented in the cookbook. They **MUST NOT** be treated as a mandatory first-read corpus.
@@ -194,6 +204,8 @@ Only after B helps, try optional profiles (one stream pack, hub umbrella, accept
 ## Status
 
 `0.2.0-draft` — experimental Map v2 blueprint with a **dogfood-informed cookbook**. Useful in multi-repo pilots. **Not** production infrastructure or a finished interoperability standard. Core remains draft; optional profiles do not promote Core to stable.
+
+**Prototype narrative (docs only):** Unreleased cookbook work prepares a possible later `0.2.1-prototype` **docs** label (see CHANGELOG candidate notes). That is **not** a claim that Core is stable, and **no** prototype git tag is cut from cookbook PRs alone.
 
 Feedback is especially welcome on:
 

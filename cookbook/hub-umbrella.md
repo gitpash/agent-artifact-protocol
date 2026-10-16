@@ -79,7 +79,9 @@ nodes: []   # or peers only — not the whole company
 
 ## See also
 
-- [`examples/shell/`](../examples/shell/) — tiny one-hop shell  
+- [`examples/shell/`](../examples/shell/) — tiny one-hop shell (README points here for scale-up)  
 - [`examples/hub-umbrella/`](../examples/hub-umbrella/) — synthetic multi-node shell + child  
+- [`examples/invalid/anti-recursive-preload.md`](../examples/invalid/anti-recursive-preload.md) — negative teaching  
 - [`stream-packs.md`](./stream-packs.md) — optional session procedure after orientation  
 - [`local-bootstrap.md`](./local-bootstrap.md) — GPS and thin local files  
+ 

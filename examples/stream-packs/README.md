@@ -12,6 +12,8 @@
 
 Core Orientation still needs only a discoverable map. Open **exactly one** stream pack per session.
 
-Cookbook: [`../../cookbook/stream-packs.md`](../../cookbook/stream-packs.md), [`../../cookbook/local-bootstrap.md`](../../cookbook/local-bootstrap.md).
+Cookbook: [`../../cookbook/stream-packs.md`](../../cookbook/stream-packs.md), [`../../cookbook/local-bootstrap.md`](../../cookbook/local-bootstrap.md), [`../../cookbook/done-bar.md`](../../cookbook/done-bar.md).  
+Stubs: [`../../templates/orientation.md`](../../templates/orientation.md), [`../../templates/stream-pack.yaml`](../../templates/stream-pack.yaml).  
+Anti-patterns: [`../invalid/anti-multi-stream-open.md`](../invalid/anti-multi-stream-open.md).
 
 These YAMLs are **not** validated as Map v2 documents by `scripts/validate.py`.

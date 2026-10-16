@@ -33,8 +33,10 @@ If you saw AAP grow inside a company monorepo first, **do not** treat that tree 
 | Generic examples | Teaching |
 | Hub-umbrella example shape | Teaching multi-node orientation |
 | Stream pack **idea** + sample ids | Optional disclosure profile |
-| Accept-default **idea** | Optional honesty bar |
+| Accept-default / done-bar **idea** | Optional honesty bar |
 | Thin orientation card template | Optional local card |
+| Schema-pinning **practice** | Consumer validator honesty |
+| Glass-box / orchestrator **shape** (not CLI) | Optional runtime stories |
 
 ## Rule
 

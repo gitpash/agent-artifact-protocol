@@ -11,7 +11,7 @@ Add AAP orientation to an existing repo **without** rewriting its docs system.
    - Artifacts later (envelopes on touch)  
 
 2. **Pin upstream (optional but recommended)**  
-   Record the immutable v2 tag or commit in a one-line note, e.g. `.aap/VERSION`. Do not validate against a floating branch tip:
+   Record the immutable v2 tag or commit in a one-line note, e.g. `.aap/VERSION`. Do not validate against a floating branch tip. Details: [`schema-pinning.md`](./schema-pinning.md).
 
    ```text
    v0.2.0-draft
@@ -42,7 +42,7 @@ Add AAP orientation to an existing repo **without** rewriting its docs system.
    When a behavior change needs durable memory, use the first writable `layout.artifacts` resource reference (same no-overwrite rule). In a brownfield corpus, keep legacy roots `read-only`; a material update creates or updates a canonical successor and leaves a compatibility pointer. Do not bulk-migrate.
 
 7. **Optional profiles (only after map-only helps)**  
-   Multi-repo shell: [`hub-umbrella.md`](./hub-umbrella.md). Session procedure: [`stream-packs.md`](./stream-packs.md) + [`local-bootstrap.md`](./local-bootstrap.md). Do not enable every profile because it exists.
+   Multi-repo shell: [`hub-umbrella.md`](./hub-umbrella.md). Session procedure: [`stream-packs.md`](./stream-packs.md) + [`local-bootstrap.md`](./local-bootstrap.md). Honesty exit: [`done-bar.md`](./done-bar.md). Stubs: [`templates/orientation.md`](../templates/orientation.md), [`templates/stream-pack.yaml`](../templates/stream-pack.yaml). Do not enable every profile because it exists.
 
 ## Anti-patterns
 

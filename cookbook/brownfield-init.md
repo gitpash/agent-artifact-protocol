@@ -41,6 +41,9 @@ Add AAP orientation to an existing repo **without** rewriting its docs system.
 6. **Artifacts on touch**  
    When a behavior change needs durable memory, use the first writable `layout.artifacts` resource reference (same no-overwrite rule). In a brownfield corpus, keep legacy roots `read-only`; a material update creates or updates a canonical successor and leaves a compatibility pointer. Do not bulk-migrate.
 
+7. **Optional profiles (only after map-only helps)**  
+   Multi-repo shell: [`hub-umbrella.md`](./hub-umbrella.md). Session procedure: [`stream-packs.md`](./stream-packs.md) + [`local-bootstrap.md`](./local-bootstrap.md). Do not enable every profile because it exists.
+
 ## Anti-patterns
 
 - Fetching this GitHub repo on every agent session  

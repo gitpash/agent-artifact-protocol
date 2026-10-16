@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../../schemas/map.schema.json
+# Synthetic multi-repo shell. Nodes are direct hops only — not a service mesh.
+# path may differ from locator.repo (directory name ≠ remote name).
+version: 2
+workspace:
+  id: product-shell
+  description: Meta checkout listing direct product hops.
+self:
+  id: product-shell
+  kind: repository
+  path: .
+layout:
+  artifacts: docs/artifacts/
+  scratch: docs/scratch/
+nodes:
+  - id: orders-api
+    kind: repository
+    path: services/orders-api
+    description: Orders domain service.
+    locator:
+      repo: example/orders-api
+    map:
+      path: .aap/map.yaml
+    write:
+      - maintainer
+  - id: scorecard
+    kind: repository
+    path: vendor-scorecard
+    description: Path id differs from remote repository name.
+    locator:
+      repo: example/pepsi-scorecard
+    map:
+      path: .aap/map.yaml
+  - id: edge-gateway
+    kind: repository
+    path: apps/edge-gateway
+    description: Edge/API gateway the web UI calls.
+    locator:
+      repo: example/edge-gateway
+    map:
+      path: .aap/map.yaml
+  - id: web-console
+    kind: repository
+    path: apps/web-console
+    description: Operator UI; hops to gateway + orders only.
+    locator:
+      repo: example/web-console
+    map:
+      path: .aap/map.yaml
+  - id: partner-billing
+    kind: external
+    description: Consume-only external docs hop.
+    locator:
+      repo: example/partner-billing
+    access: read-only

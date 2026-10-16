@@ -1,0 +1,21 @@
+# Example only — copy to map.local.yaml and gitignore the live file.
+# overlays = machine GPS (schema-compatible idea).
+# streams / orientation / acceptance = optional profile index (local convention).
+
+overlays:
+  nodes:
+    orders-api:
+      path: /home/you/work/orders-api
+    edge-gateway:
+      path: /home/you/work/edge-gateway
+
+orientation: .aap/local/orientation.md
+
+streams:
+  disclosure: .aap/local/streams/
+  default: research
+  packs:
+    - research
+    - release-check
+
+acceptance: .aap/local/streams/_accept-default.yaml

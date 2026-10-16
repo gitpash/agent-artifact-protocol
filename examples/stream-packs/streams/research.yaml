@@ -1,0 +1,29 @@
+# Optional stream pack — not a Map v2 document.
+id: research
+summary: Domain answers from map hops + file or git evidence
+when:
+  - where is
+  - blast radius
+  - investigate
+  - how does
+read_first:
+  - .aap/map.yaml
+open_when_needed:
+  - .aap/local/orientation.md
+  - docs/artifacts/
+tools:
+  rules:
+    - Prefer map node hops before wide repository search
+    - If an optional knowledge index or retrieval tool is empty, degrade and say so
+    - Use git history when path ownership is unclear
+process:
+  - State the question and candidate map nodes
+  - Open only the layout roots or child maps the question needs
+  - Cite workspace-relative paths for factual claims
+acceptance:
+  - Claims tied to file, map, or git evidence
+  - Wrong-home guesses corrected or marked uncertain
+forbid:
+  - Preload full constitution or skill catalogs
+  - Open every stream pack in one session
+  - Invent write homes outside layout resourceRefs

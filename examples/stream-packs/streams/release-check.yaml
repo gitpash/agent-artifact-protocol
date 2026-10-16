@@ -1,0 +1,30 @@
+# Optional stream pack — not a Map v2 document.
+id: release-check
+summary: Ship / release scan with honest check status
+when:
+  - release
+  - ship
+  - pr ready
+  - what changed
+read_first:
+  - .aap/map.yaml
+open_when_needed:
+  - .aap/local/orientation.md
+  - .aap/local/streams/_accept-default.yaml
+tools:
+  rules:
+    - Prefer git and CI status over memory of last green build
+    - If release notes or changelog roots are mapped, read those layout keys first
+    - Degrade clearly when CI or graph indexes are unavailable
+process:
+  - Identify the change set (commits, PR, or paths)
+  - List checks run and their pass / fail / skip(reason)
+  - Separate merged vs in-flight vs blocked
+acceptance:
+  - Check results evidence-linked (log, UI, or command output summary)
+  - No "PR ready" claim while required checks are red
+  - Blockers named with owner or next action when known
+forbid:
+  - Ship narrative on failing required checks
+  - Evidence-free BLOCKER labels
+  - Preloading unrelated stream packs

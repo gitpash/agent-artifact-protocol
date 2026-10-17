@@ -213,6 +213,7 @@ flowchart LR
 | Thin orientation + local index | [`local-bootstrap.md`](./cookbook/local-bootstrap.md) |
 | Accept / done bar | [`done-bar.md`](./cookbook/done-bar.md) |
 | Schema pin (no tip fetch) | [`schema-pinning.md`](./cookbook/schema-pinning.md) |
+| CI validation (pinned schema on consumer maps) | [`ci-validation.md`](./cookbook/ci-validation.md) |
 | Manager/worker session shape | [`orchestrator-session.md`](./cookbook/orchestrator-session.md) |
 | Glass-box factory *pattern* (no CLI in this repo) | [`glass-box-factory.md`](./cookbook/glass-box-factory.md) |
 | Measuring map value (A/B method only) | [`measuring.md`](./cookbook/measuring.md) |

@@ -195,6 +195,8 @@ Nodes are **doors**, not “load every submodule into context.”
 
 ## Optional profiles (not Core L0)
 
+Incubator maturity table (status / based on / used by): [`cookbook/README.md`](./cookbook/README.md).
+
 After map-only helps, you **may** add local procedure files (often gitignored):
 
 ```mermaid

@@ -1,5 +1,7 @@
 # Cookbook: glass-box factory (optional pattern)
 
+> **Profile status:** tried once
+
 > **Optional pattern — not required for Orientation conformance.**  
 > Documents a *shape* for visible multi-session work. **No CLI or harness ships in this Core repo.**
 

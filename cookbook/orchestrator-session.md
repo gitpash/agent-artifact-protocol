@@ -1,5 +1,7 @@
 # Cookbook: orchestrator session (optional profile)
 
+> **Profile status:** tried once
+
 > **Optional profile — not required for Orientation conformance.**  
 > Harness-agnostic **shape** for manager / worker / handoff. Multi-agent “teams” features are **one** possible implementation — not required by AAP.
 

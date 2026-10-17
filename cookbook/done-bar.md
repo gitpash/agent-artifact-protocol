@@ -1,5 +1,7 @@
 # Cookbook: done bar (optional profile)
 
+> **Profile status:** used in practice
+
 > **Optional profile — not required for Orientation conformance.**  
 > Core L0 remains: discoverable map only.
 

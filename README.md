@@ -39,7 +39,7 @@ Coding agents often fail on **orientation** and **context pollution**, not on �
 | No GPS | Multi-repo: path ≠ GitHub name; no clear hop | **Core** (nodes) |
 | Fake confidence | “PR ready” with red CI / invented blockers | ***Profile*** ([done-bar](./cookbook/done-bar.md)) |
 
-**AAP’s bet** (thesis, not a measured claim here): a sparse map + disclosure beats a bigger prompt. See [`MOTIVATION.md`](./MOTIVATION.md); validate with a local A/B (below) before you expand.
+**AAP’s bet** (thesis, not a measured claim here): a sparse map + disclosure beats a bigger prompt. See [`MOTIVATION.md`](./MOTIVATION.md). How to run an honest local A/B: [`cookbook/measuring.md`](./cookbook/measuring.md).
 
 ```mermaid
 flowchart LR
@@ -213,6 +213,7 @@ flowchart LR
 | Schema pin (no tip fetch) | [`schema-pinning.md`](./cookbook/schema-pinning.md) |
 | Manager/worker session shape | [`orchestrator-session.md`](./cookbook/orchestrator-session.md) |
 | Glass-box factory *pattern* (no CLI in this repo) | [`glass-box-factory.md`](./cookbook/glass-box-factory.md) |
+| Measuring map value (A/B method only) | [`measuring.md`](./cookbook/measuring.md) |
 
 Stubs: [`templates/orientation.md`](./templates/orientation.md), [`templates/stream-pack.yaml`](./templates/stream-pack.yaml).
 

@@ -290,7 +290,7 @@ README.md SPEC.md MOTIVATION.md CONTRIBUTING.md CHANGELOG.md
 schemas/          # Map v2 JSON Schema
 legacy/v1/        # historical zones map
 templates/        # minimal-map, orientation, stream-pack, artifacts
-examples/         # single-repo, shell, hub-umbrella, stream-packs, invalid
+examples/         # single-repo, shell, hub-umbrella, meta-repo, stream-packs, invalid
 cookbook/         # optional profiles + patterns
 scripts/validate.py
 ```

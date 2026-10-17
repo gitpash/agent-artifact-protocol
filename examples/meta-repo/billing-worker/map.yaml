@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=../../../schemas/map.schema.json
+# Fictional child map. self.parent is navigation only (not ownership).
+version: 2
+workspace:
+  id: billing-worker
+  description: Fictional billing worker (child of acme-platform).
+self:
+  id: billing-worker
+  kind: repository
+  path: .
+  description: Billing worker checkout (synthetic).
+  parent:
+    id: acme-platform
+    locator:
+      repo: example/acme-platform
+    map:
+      path: map.yaml
+layout:
+  code: src/
+  tests: tests/
+  artifacts: docs/artifacts/
+  scratch: docs/scratch/
+  devops: deploy/
+nodes: []

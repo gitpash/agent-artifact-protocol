@@ -38,7 +38,7 @@ https://raw.githubusercontent.com/gitpash/agent-artifact-protocol/main/llms.txt
 
 Paste that into any chat or agent session and ask it to explain AAP or to work in a repo that has an `.aap/map.yaml`. It points to the spec and schema only for when they are needed.
 
-**Add a map to your own project with the `aap-map` skill.** The skill in [`skills/aap-map/`](./skills/aap-map/SKILL.md) drafts a minimal `.aap/map.yaml` for any codebase, validates it against the bundled schema, and marks anything it could not verify with `# REVIEW:` comments for you to check. It never overwrites an existing map. Install it as a plain skill folder:
+**Add a map to your own project with the `aap-map` skill.** The skill in [`skills/aap-map/`](./skills/aap-map/SKILL.md) is a single text file. It tells your agent how to look at a repository, write a minimal `.aap/map.yaml`, and say which parts it guessed (`# REVIEW:` comments). It does not interview you and it never overwrites an existing map. Say "ok" or ask for changes. Install it as a plain skill folder:
 
 ```bash
 # Claude Code, user-level
@@ -46,7 +46,7 @@ git clone --depth 1 https://github.com/gitpash/agent-artifact-protocol.git /tmp/
 cp -R /tmp/aap/skills/aap-map ~/.claude/skills/aap-map
 ```
 
-Then ask your agent: *"use the aap-map skill to add an AAP map to this repo"*. Nothing to install: the skill checks the map by hand against a short checklist, and uses a standard-library `python3` script for a machine check when Python is available.
+Then ask your agent: *"use the aap-map skill to add an AAP map to this repo"*. Nothing to install and nothing is validated by a tool at this point. If you want machine checking later, for example in CI, see [`cookbook/ci-validation.md`](./cookbook/ci-validation.md).
 
 Package layouts for skill installers and the Claude Code plugin marketplace (`.claude-plugin/`) are included in the repo, but the skill is not listed in any registry yet.
 
@@ -311,7 +311,7 @@ This is a **convention + schemas**, not a complete cross-file protocol suite.
 
 ```text
 README.md SPEC.md MOTIVATION.md CONTRIBUTING.md CHANGELOG.md llms.txt
-skills/aap-map/   # portable agent skill + validator + bundled schema copy
+skills/aap-map/   # portable agent skill (one SKILL.md)
 .claude-plugin/   # plugin + marketplace manifests (not published)
 schemas/          # Map v2 JSON Schema
 legacy/v1/        # historical zones map

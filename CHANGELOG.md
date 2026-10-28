@@ -3,9 +3,9 @@
 ## Unreleased
 
 - `llms.txt`: agent-readable entry point (what AAP is, what to open first, `access` rules, links).
-- `skills/aap-map/`: portable agent skill that drafts and validates a minimal map. Validation has three levels (manual checklist, dependency-free `scripts/validate_map.py`, full jsonschema) and a bundled copy of the Map v2 schema.
+- `skills/aap-map/`: portable agent skill (one SKILL.md) that writes a minimal map and flags guesses for review. No scripts or dependencies; machine validation stays a CI choice (`cookbook/ci-validation.md`).
 - `.claude-plugin/` manifests and a README section "Use with your agent". Nothing is published to any registry.
-- `scripts/validate.py` checks that the bundled schema copy matches `schemas/map.schema.json`, that plugin manifests parse, and that the dependency-free validator agrees with jsonschema on all fixtures and mutated maps.
+- `scripts/validate.py` also checks that the plugin manifests parse.
 
 ## 0.2.1-prototype — 2026-10-16
 

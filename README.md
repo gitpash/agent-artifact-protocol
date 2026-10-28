@@ -28,6 +28,30 @@ The map is checked against **JSON Schema by a validator in CI**, so structure dr
 
 ---
 
+## Use with your agent
+
+**Give your LLM one link.** [`llms.txt`](./llms.txt) is written for an agent to read: what AAP is, what to open first, and the `access` rules.
+
+```text
+https://raw.githubusercontent.com/gitpash/agent-artifact-protocol/main/llms.txt
+```
+
+Paste that into any chat or agent session and ask it to explain AAP or to work in a repo that has an `.aap/map.yaml`. It points to the spec and schema only for when they are needed.
+
+**Add a map to your own project with the `aap-map` skill.** The skill in [`skills/aap-map/`](./skills/aap-map/SKILL.md) drafts a minimal `.aap/map.yaml` for any codebase, validates it against the bundled schema, and marks anything it could not verify with `# REVIEW:` comments for you to check. It never overwrites an existing map. Install it as a plain skill folder:
+
+```bash
+# Claude Code, user-level
+git clone --depth 1 https://github.com/gitpash/agent-artifact-protocol.git /tmp/aap
+cp -R /tmp/aap/skills/aap-map ~/.claude/skills/aap-map
+```
+
+Then ask your agent: *"use the aap-map skill to add an AAP map to this repo"*. Validation needs `pip install pyyaml jsonschema` (or `uv run --with pyyaml --with jsonschema`).
+
+Package layouts for skill installers and the Claude Code plugin marketplace (`.claude-plugin/`) are included in the repo, but the skill is not listed in any registry yet.
+
+---
+
 ## What problem is this for?
 
 Coding agents often fail on **orientation** and **context pollution**, not on “missing a wiki page.”
@@ -286,7 +310,9 @@ This is a **convention + schemas**, not a complete cross-file protocol suite.
 ## What’s in this repository
 
 ```text
-README.md SPEC.md MOTIVATION.md CONTRIBUTING.md CHANGELOG.md
+README.md SPEC.md MOTIVATION.md CONTRIBUTING.md CHANGELOG.md llms.txt
+skills/aap-map/   # portable agent skill + validator + bundled schema copy
+.claude-plugin/   # plugin + marketplace manifests (not published)
 schemas/          # Map v2 JSON Schema
 legacy/v1/        # historical zones map
 templates/        # minimal-map, orientation, stream-pack, artifacts

@@ -59,6 +59,12 @@ def main() -> None:
         die("PyYAML and jsonschema required: pip install pyyaml jsonschema")
     map_schema = load_json(ROOT / "schemas" / "map.schema.json")
     envelope_schema = load_json(ROOT / "schemas" / "artifact-envelope.schema.json")
+    bundled = ROOT / "skills" / "aap-map" / "schema" / "map.schema.json"
+    if bundled.exists() and load_json(bundled) != map_schema:
+        die("skills/aap-map/schema/map.schema.json differs from schemas/map.schema.json (re-copy it)")
+    for manifest in sorted((ROOT / ".claude-plugin").glob("*.json")):
+        load_json(manifest)
+        print(f"OK json {manifest.relative_to(ROOT)}")
     jsonschema.Draft7Validator.check_schema(map_schema)
     jsonschema.Draft7Validator.check_schema(envelope_schema)
     print("OK schemas self-validate")

@@ -98,6 +98,5 @@ Before claiming done / ship / PR-ready, walk a small checklist (orient, evidence
 - [`done-bar.md`](./done-bar.md)  
 - [`schema-pinning.md`](./schema-pinning.md)  
 - [`hub-umbrella.md`](./hub-umbrella.md)  
-- [`what-not-to-copy.md`](./what-not-to-copy.md)  
 - [`brownfield-init.md`](./brownfield-init.md) — still ends at map-only experiment first  
  

@@ -90,4 +90,3 @@ Harnesses MAY require walking the bar before “done.” That is **consumer/runt
 
 - [`stream-packs.md`](./stream-packs.md)  
 - [`local-bootstrap.md`](./local-bootstrap.md)  
-- [`what-not-to-copy.md`](./what-not-to-copy.md)  

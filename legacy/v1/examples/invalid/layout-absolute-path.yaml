@@ -1,7 +1,0 @@
-version: 1
-zones:
-  app:
-    path: .
-    write: [maintainer]
-    layout:
-      code: /abs/src/

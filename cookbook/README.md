@@ -1,20 +1,16 @@
-# Cookbook profiles — status incubator
+# Cookbook
 
-Optional profiles and patterns. **Not Core L0.** Status is author-maintained maturity signal only.
+Optional profiles and how-to pages. None of them is part of the mandatory first read (L0), and none is needed to claim Orientation conformance. Start with the map alone and add a page here only when the map has already helped and you want more.
 
-Allowed status values: `used in practice` · `tried once` · `idea only` · empty (pending author)
+| Page | What it covers |
+|------|----------------|
+| [brownfield-init](./brownfield-init.md) | Add a map to an existing repository without touching its docs system |
+| [hub-umbrella](./hub-umbrella.md) | A hub map for several repositories, with nodes as navigation hops |
+| [schema-pinning](./schema-pinning.md) | Pin the schema by tag or commit instead of following the branch tip |
+| [ci-validation](./ci-validation.md) | Check maps against the pinned schema in CI (optional) |
+| [measuring](./measuring.md) | How to run an honest A/B of map versus no map |
+| [local-bootstrap](./local-bootstrap.md) | A thin orientation card and local index beside the map |
+| [stream-packs](./stream-packs.md) | One task-class procedure pack per session |
+| [done-bar](./done-bar.md) | A short checklist before an agent calls work done |
 
-| Profile | Status | Based on | Used by |
-|---------|--------|----------|---------|
-| [schema-pinning](./schema-pinning.md) | used in practice | pin / immutable tag practice | author only |
-| [local-bootstrap](./local-bootstrap.md) | used in practice | thin orientation + local index | author only |
-| [done-bar](./done-bar.md) | used in practice | accept before done / PR | author only |
-| [glass-box-factory](./glass-box-factory.md) | tried once | recent early trial | author only |
-| [orchestrator-session](./orchestrator-session.md) | tried once | recent early trial | author only |
-| [stream-packs](./stream-packs.md) | — | one task-class pack per session | — |
-| [hub-umbrella](./hub-umbrella.md) | — | multi-repo shell map hops | — |
-| [brownfield-init](./brownfield-init.md) | — | add map to an existing repo | — |
-
-`what-not-to-copy` is guidance, not a profile — omitted from this table.
-
-See also: [root README — optional profiles](../README.md#optional-profiles-not-core-l0).
+Templates for the last three are in [`../templates/`](../templates/) and samples in [`../examples/stream-packs/`](../examples/stream-packs/).

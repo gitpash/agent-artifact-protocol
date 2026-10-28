@@ -1,7 +1,5 @@
 # Cookbook: brownfield init
 
-> **Profile status:** pending author
-
 ## Goal
 
 Add AAP orientation to an existing repo **without** rewriting its docs system.
@@ -16,7 +14,7 @@ Add AAP orientation to an existing repo **without** rewriting its docs system.
    Record the immutable v2 tag or commit in a one-line note, e.g. `.aap/VERSION`. Do not validate against a floating branch tip. Details: [`schema-pinning.md`](./schema-pinning.md).
 
    ```text
-   v0.2.1-prototype
+   v0.3.0
    https://github.com/gitpash/agent-artifact-protocol
    ```
 

@@ -63,7 +63,7 @@ Coding agents often fail on **orientation** and **context pollution**, not on �
 | No GPS | Multi-repo: path ≠ GitHub name; no clear hop | **Core** (nodes) |
 | Fake confidence | “PR ready” with red CI / invented blockers | ***Profile*** ([done-bar](./cookbook/done-bar.md)) |
 
-**AAP’s bet** (thesis, not a measured claim here): a sparse map + disclosure beats a bigger prompt. See [`MOTIVATION.md`](./MOTIVATION.md). How to run an honest local A/B: [`cookbook/measuring.md`](./cookbook/measuring.md).
+**AAP’s bet** (thesis, not a measured claim here): a sparse map + disclosure beats a bigger prompt. See [`docs/motivation.md`](./docs/motivation.md). How to run an honest local A/B: [`cookbook/measuring.md`](./cookbook/measuring.md).
 
 ```mermaid
 flowchart LR

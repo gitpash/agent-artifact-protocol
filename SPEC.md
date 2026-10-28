@@ -2,8 +2,7 @@
 
 **Name:** Agent Artifact Protocol (AAP)  
 **Kind:** filesystem convention + JSON Schema  
-**Version:** 0.2.1-prototype  
-**Status:** experimental Core (Map v2) + prototype docs/cookbook (profiles optional)
+**Version:** 0.3.0 (experimental, pre-1.0)
 
 AAP makes repository context addressable without requiring it to be loaded. It is a small, runtime-agnostic navigation convention for repositories and optional durable artifacts. It is not a context engine, agent framework, retrieval protocol, dependency graph, or authorization system.
 

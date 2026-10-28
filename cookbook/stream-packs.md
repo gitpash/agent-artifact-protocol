@@ -1,7 +1,5 @@
 # Cookbook: stream packs (optional profile)
 
-> **Profile status:** pending author
-
 > **Optional profile — not required for Orientation conformance.**  
 > Core L0 remains: discoverable map only.
 

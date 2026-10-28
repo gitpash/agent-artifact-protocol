@@ -1,7 +1,5 @@
 # Cookbook: local bootstrap (optional profile)
 
-> **Profile status:** used in practice
-
 > **Optional profile — not required for Orientation conformance.**  
 > Keeps machine GPS and session procedure out of the committed Core map.
 

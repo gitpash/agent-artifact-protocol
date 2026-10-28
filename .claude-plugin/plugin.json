@@ -1,7 +1,7 @@
 {
   "name": "aap",
-  "version": "0.2.1",
-  "description": "Agent Artifact Protocol tooling: the aap-map skill drafts and validates a minimal .aap/map.yaml for any repository.",
+  "version": "0.3.0",
+  "description": "The aap-map skill writes a minimal .aap/map.yaml for a repository and marks its guesses for human review.",
   "author": { "name": "gitpash" },
   "repository": "https://github.com/gitpash/agent-artifact-protocol",
   "license": "MIT",

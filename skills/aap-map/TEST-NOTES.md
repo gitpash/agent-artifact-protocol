@@ -29,10 +29,19 @@ No run admitted a node. Third-party libraries and README mentions were rejected,
 
 Reviewer findings applied: do not assume a git repo; do not guess `locator.repo` or the host; `read-only` needs written evidence, a folder name is not enough; slugify ids without reordering words; edit the map textually so comments survive; validator warns on absolute, `~`, backslash and `..` paths in `self.path`, `node.path` and `map.path` (the schema only checks layout paths); validator sort no longer crashes on mixed index and key error paths; REVIEW marker count matches only YAML comments; `python3` / `py -3` and absolute script path; honest "validation NOT RUN" fallback; do not create a second map next to an existing one.
 
+## Validator without dependencies (second pass)
+
+The first version of the skill required PyYAML and jsonschema, which is a poor ask for a skill that should work on any machine. The skill now has three levels: a manual checklist (always possible), a standard-library `python3` script with its own small YAML reader (no installs), and the full `jsonschema` check kept for the AAP repository itself. The report states which level actually ran, and only levels 2 and 3 may be called "validated".
+
+Safety net: `scripts/validate.py` runs the standard-library validator and PyYAML plus jsonschema over every valid example, every invalid fixture and 20 mutated maps. It fails if they disagree on accept or reject, or if the standard-library reader parses a file differently from PyYAML. The three maps produced in the tests above were rechecked with the new script and give the same results.
+
+Unsupported YAML (anchors, tags, multi-line plain scalars, tabs, multi-line flow collections) is rejected with a message asking for block style, not guessed at.
+
 ## Known limits
 
 - Tested with Claude subagents only. Other agents were not tried.
 - The schema's `pathString` pattern rejects any path containing `..` even as part of a name (`a..b`). That is the schema's behavior and was left alone.
 - `layout` paths are literal. There are no globs, so large monorepos get a coarse parent folder.
 - The bundled schema keeps its original `$id`. A CI check in `scripts/validate.py` keeps it identical to `schemas/map.schema.json`.
+- The standard-library validator was tested on macOS with Python 3.15 only. Older Python 3 versions and Windows were not tried.
 - Not tested: Windows, a machine with no network and no Python, and a repository that already has a map.

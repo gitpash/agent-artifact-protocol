@@ -14,7 +14,7 @@ Schema validity proves shape only. It does not prove that the paths are right or
 ## Files in this skill
 
 - `schema/map.schema.json`: byte-identical copy of `schemas/map.schema.json` from the AAP repo at tag `v0.2.1-prototype`. If the two ever differ, the repo copy wins.
-- `scripts/validate_map.py`: validator. Needs PyYAML and jsonschema.
+- `scripts/validate_map.py`: optional validator, standard-library Python 3 only, no packages to install.
 
 Resolve these paths relative to this SKILL.md, not to the project you are mapping. Use the absolute path when you run the validator.
 
@@ -113,15 +113,26 @@ Edit the file textually. Do not load it into a YAML library and dump it back, wh
 
 ### 5. Validate
 
+Nothing here needs an install. Use the highest level that works on this machine and say which one you used.
+
+**Level 1, always: manual checklist.** Check the file yourself against these rules (they are the whole schema):
+
+- `version: 2`, and `workspace`, `self` and `nodes` all present. `nodes` is a list (`[]` is fine).
+- `workspace` has only `id` and `description`. `self` has `id`, `kind` and optionally `path`, `description`, `parent`.
+- Every id (`workspace.id`, `self.id`, node ids, `parent.id`) matches `^[a-z][a-z0-9-]*$`.
+- Every layout value is a path string, or `{ path, access?, description? }`, or a non-empty list of those. `access` is `read-only` or `read-write` and nothing else.
+- Paths are relative: no leading `/`, no `..`, no `~`, no backslashes, no Windows drive letters.
+- A node has `id` and `kind`, and only these other fields: `description`, `path`, `locator`, `map`, `mirror`, `access`, `write`. `locator` needs `repo`, `url` or `id`. `map` needs `path` or `url`.
+- No unknown fields anywhere, except extra keys under `layout`. Descriptions are quoted strings.
+- Every path in the map exists on disk (check with `ls`), or is flagged with a REVIEW comment.
+
+**Level 2, if `python3` is on the machine: bundled script.** It uses only the Python standard library.
+
 ```bash
 python3 /absolute/path/to/aap-map/scripts/validate_map.py .aap/map.yaml
 ```
 
-(On Windows use `py -3` instead of `python3`.)
-
-If PyYAML or jsonschema are missing, either `pip install pyyaml jsonschema` (inside a virtualenv, not system-wide) or run `uv run --with pyyaml --with jsonschema python3 /absolute/path/to/aap-map/scripts/validate_map.py .aap/map.yaml`. Do not install packages into the project's own environment without asking.
-
-Output contract:
+(On Windows use `py -3`.) Output contract:
 
 ```text
 VALIDATION_SUCCESS
@@ -132,9 +143,13 @@ VALIDATION_FAILED
 - path: /nodes/0/id | message: ...
 ```
 
-On failure, patch the file from the path and message and run again. Stop after 5 rounds and report what is still failing. Do not weaken the schema or edit the bundled copy to make a map pass.
+The script reads a deliberately small YAML subset. If it answers "unsupported YAML", rewrite the map in plain block style (indented `key: value` lines, quoted strings) and run it again; that is not a schema error.
 
-If Python is not available at all, report "validation NOT RUN" and never call the map valid. Self-check the rules above (id pattern, no absolute paths, no `..`, quoted descriptions) and show the user the one command to run later.
+**Level 3, optional, for AAP maintainers: full JSON Schema.** The AAP repository's `scripts/validate.py` uses `jsonschema` against `schemas/map.schema.json`. Do not install anything to reach this level unless the user asks. `uv run --with pyyaml --with jsonschema python3 scripts/validate.py` runs it without touching the project's environment.
+
+On failure at level 2, patch the file from the path and message and run again. Stop after 5 rounds and report what is still failing. Do not weaken the schema or edit the bundled copy to make a map pass.
+
+If you could only do level 1, the map is "checked by hand, not by a machine": say that, never call it validated, and give the user the level 2 command to run later.
 
 ### 6. Hand over for review
 
@@ -143,7 +158,7 @@ Do not claim the map is done. End with this report, plainly:
 ```text
 ## aap-map result
 - file: .aap/map.yaml (new | unchanged | proposed diff)
-- validation: PASS | FAIL | NOT RUN (why)
+- validation level actually run: 1 manual checklist | 2 bundled script (PASS or FAIL) | 3 full JSON Schema (PASS or FAIL). If 2 or 3 could not run, say why. Only 2 or 3 may be called "validated".
 - layout keys: <list> (each with the evidence you used)
 - nodes accepted: N (id, reason) / candidates rejected: N (name as seen in the repo, why; list only candidates you actually saw)
 - REVIEW markers: N (list the lines)

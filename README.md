@@ -46,7 +46,7 @@ git clone --depth 1 https://github.com/gitpash/agent-artifact-protocol.git /tmp/
 cp -R /tmp/aap/skills/aap-map ~/.claude/skills/aap-map
 ```
 
-Then ask your agent: *"use the aap-map skill to add an AAP map to this repo"*. Validation needs `pip install pyyaml jsonschema` (or `uv run --with pyyaml --with jsonschema`).
+Then ask your agent: *"use the aap-map skill to add an AAP map to this repo"*. Nothing to install: the skill checks the map by hand against a short checklist, and uses a standard-library `python3` script for a machine check when Python is available.
 
 Package layouts for skill installers and the Claude Code plugin marketplace (`.claude-plugin/`) are included in the repo, but the skill is not listed in any registry yet.
 

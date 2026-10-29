@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://gist.githubusercontent.com/gitpash/928c100ebf269acf9db7c09a18ed4a68/raw/9bec3c5cb3cc259e6197746a1c753adfe952f8cc/map.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/gitpash/agent-artifact-protocol/v0.3.0/schemas/map.schema.json
 # AAP v2 L0 orientation map — keep this file small.
 # Copy to .aap/map.yaml. Do not overwrite an existing map without confirmation.
 version: 2

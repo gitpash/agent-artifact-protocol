@@ -18,7 +18,7 @@ First release with an agent entry point and an installable skill. The Map v2 sch
 - `MOTIVATION.md` moved to `docs/motivation.md`; its pilot metrics sketch was removed (`cookbook/measuring.md` covers the method).
 - Cookbook index is a plain list. Per-page "Profile status" lines were removed.
 - Example pins in the cookbook now use `v0.3.0`.
-- `schemas/map.schema.json`: the top-level `description` no longer says "Pilot". No change to validation.
+- `schemas/map.schema.json`: `$id` now points at the tagged raw URL in this repository instead of a gist (the template editor hint likewise), and the top-level `description` no longer says "Pilot". Validation is unchanged.
 
 ### Removed
 

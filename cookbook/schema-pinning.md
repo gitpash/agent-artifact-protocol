@@ -58,7 +58,7 @@ source: https://github.com/gitpash/agent-artifact-protocol
 
 Upgrade **schema revision, lock/contract, validator, and compatibility fixtures together**. Partial upgrades are how tip-drift returns.
 
-## Dual gist vs in-repo honesty
+## Editor hint vs in-repo schema
 
 This seed’s minimal map template may carry a `yaml-language-server: $schema=…` comment pointing at a **revision-pinned** raw URL for editor UX. The **repository** also ships `schemas/map.schema.json`.
 
@@ -68,7 +68,7 @@ This seed’s minimal map template may carry a `yaml-language-server: $schema=�
 | Pinned remote URL in a comment | Editor convenience — **must** name an immutable revision, not tip |
 | Consumer contract file | Local lock for *their* validators |
 
-**MUST NOT** silently validate against Gist or GitHub **tip**. If Gist and git diverge, say so and pick one pin for automation until they match.
+**MUST NOT** silently validate against a mutable URL or GitHub **tip**. If the remote copy and the repository ever diverge, say so and pick one pin for automation until they match.
 
 Validation is **never** required for L0 orientation. Schema checks are for editors, CI, and conformance claims — not session start preload.
 

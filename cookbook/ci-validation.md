@@ -97,7 +97,7 @@ Notes:
 
 ## See also
 
-- [`schema-pinning.md`](./schema-pinning.md) — pin styles, contract sidecar, Gist vs in-repo  
+- [`schema-pinning.md`](./schema-pinning.md) — pin styles, contract sidecar, editor hint vs in-repo schema  
 - [`brownfield-init.md`](./brownfield-init.md) — pin during first map copy  
 - [`README.md`](../README.md) — `scripts/validate.py` one-liner for this seed  
 - [`CONTRIBUTING.md`](../CONTRIBUTING.md) — Core vs profile; keep L0 small  

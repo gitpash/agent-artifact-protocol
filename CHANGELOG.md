@@ -1,8 +1,29 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 — 2026-10-28
 
-(nothing yet)
+First release with an agent entry point and an installable skill. The Map v2 schema and its semantics are unchanged from 0.2.0. The "-prototype" suffix is dropped from the version: the project is still experimental, and the README Status section says so in one place.
+
+### Added
+
+- `skills/aap-map/`: an agent skill (one `SKILL.md`, no dependencies) that inspects a repository, writes a minimal `.aap/map.yaml` and marks guesses with `# REVIEW:` comments.
+- One-command install: `npx skills add gitpash/agent-artifact-protocol`, or in Claude Code `/plugin marketplace add gitpash/agent-artifact-protocol` and `/plugin install aap@agent-artifact-protocol` (`.claude-plugin/` manifests).
+- `llms.txt`: an agent-readable entry point (what AAP is, what to open first, the `access` rules, links).
+- `.aap/map.yaml`: this repository's own map, written with the skill and checked by `scripts/validate.py`.
+- `docs/skill-tests.md`: how the skill was tested and what changed as a result.
+
+### Changed
+
+- README rewritten for newcomers: install first, quick start, minimal example, one Status section. Conformance labels moved into `SPEC.md`.
+- `MOTIVATION.md` moved to `docs/motivation.md`; its pilot metrics sketch was removed (`cookbook/measuring.md` covers the method).
+- Cookbook index is a plain list. Per-page "Profile status" lines were removed.
+- Example pins in the cookbook now use `v0.3.0`.
+- `schemas/map.schema.json`: `$id` now points at the tagged raw URL in this repository instead of a gist (the template editor hint likewise), and the top-level `description` no longer says "Pilot". Validation is unchanged.
+
+### Removed
+
+- `legacy/v1/` (the v1 zones map). It stays in git history and in the `v0.1.1-draft` tag.
+- Cookbook pages `glass-box-factory.md`, `orchestrator-session.md` and `what-not-to-copy.md`. They described tooling and provenance that this repository does not ship.
 
 ## 0.2.1-prototype — 2026-10-16
 

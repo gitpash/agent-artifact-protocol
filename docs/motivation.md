@@ -1,6 +1,6 @@
-# AAP Motivation (outline)
+# AAP motivation
 
-**Status:** outline paired with Map v2 SPEC `0.2.1-prototype` (Core lineage `0.2.0-draft`)
+Why the map exists and what it deliberately leaves out. The normative text is [`SPEC.md`](../SPEC.md).
 
 ---
 
@@ -73,29 +73,6 @@ Expand schemas/profiles only if B wins on time-to-locus and wrong-home rate.
 
 ---
 
-## 6b. Experiment metrics sketch (methodology)
-
-When a pilot runs longer than a single A/B task, prefer **cheap, honest counters** over dashboards. Sketch only — adapt labels locally; do not treat this section as a product analytics spec.
-
-| Signal | What to count | Pass intuition |
-|--------|----------------|----------------|
-| **Wrong-home** | Durable writes or “fix” edits outside map write-home / wrong node checkout | B (map) lowers rate vs A |
-| **Time-to-locus** | Minutes (or turns) until first correct path/node | B faster on repeat task classes |
-| **Graph / index degrade honesty** | Sessions where optional retrieval was empty/stale **and** the agent said so vs silent proceed | Degrade named ≥ silent fiction |
-| **Accept-bar catches** | Done-bar steps that failed before a bad “PR ready” (red checks, evidence-free blocker, skipped orient) | Catches > 0 in early weeks is success, not shame |
-| **Preload pressure** | Times session opened all packs or recursive child maps | Should trend down after stream-pack profile |
-
-**Honesty rules for the sketch:**
-
-- Missing optional index ≠ green “nothing found” without a degrade line.  
-- Wrong-home includes inventing parallel `docs/` roots the map never named.  
-- Accept-bar catches are **local process metrics**; they are not Core conformance scores.  
-- Do not publish internal pilot paths or vendor tool ids as if they were AAP required vocabulary.
-
-Optional profiles that support the loop: done bar, stream packs, hub umbrella (see cookbook). Still: if plain map-only B does not win, **shrink** — do not add metrics theater.
-
----
-
 ## 7. Closing lines
 
 > Conventions over infrastructure.  
@@ -103,4 +80,4 @@ Optional profiles that support the loop: done bar, stream packs, hub umbrella (s
 > Progressive disclosure over context dumping.  
 > Files over runtime dependencies.
 
-Normative detail: [`SPEC.md`](./SPEC.md). This document explains motivation and positioning; it is not an evidence-backed white paper or normative specification.
+This document explains motivation and positioning. It is not an evidence-backed white paper and not a specification.

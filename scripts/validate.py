@@ -59,18 +59,21 @@ def main() -> None:
         die("PyYAML and jsonschema required: pip install pyyaml jsonschema")
     map_schema = load_json(ROOT / "schemas" / "map.schema.json")
     envelope_schema = load_json(ROOT / "schemas" / "artifact-envelope.schema.json")
+    for manifest in sorted((ROOT / ".claude-plugin").glob("*.json")):
+        load_json(manifest)
+        print(f"OK json {manifest.relative_to(ROOT)}")
     jsonschema.Draft7Validator.check_schema(map_schema)
     jsonschema.Draft7Validator.check_schema(envelope_schema)
     print("OK schemas self-validate")
     map_validator = jsonschema.Draft7Validator(map_schema)
     envelope_validator = jsonschema.Draft7Validator(envelope_schema)
-    # templates + every examples/**/map.yaml except under examples/invalid/
+    # template, this repo's own map, every examples/**/map.yaml except under examples/invalid/
     example_maps = sorted(
         path
         for path in (ROOT / "examples").rglob("map.yaml")
         if "invalid" not in path.relative_to(ROOT / "examples").parts
     )
-    positives = [ROOT / "templates" / "minimal-map.yaml"] + example_maps
+    positives = [ROOT / "templates" / "minimal-map.yaml", ROOT / ".aap" / "map.yaml"] + example_maps
     for path in positives:
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
         errors = list(map_validator.iter_errors(data)) + [Exception(error) for error in layout_path_errors(data)]

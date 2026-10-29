@@ -1,0 +1,16 @@
+version: 2
+workspace:
+  id: agent-artifact-protocol
+  description: "The AAP specification, its JSON Schemas, examples, the aap-map skill and the optional cookbook."
+self:
+  id: agent-artifact-protocol
+  kind: repository
+  path: .
+layout:
+  # REVIEW: the spec itself is SPEC.md at the repository root; layout keys point at folders, so it has no key
+  schemas: schemas/
+  skills: skills/
+  examples: examples/
+  cookbook: cookbook/
+  scripts: scripts/
+nodes: []

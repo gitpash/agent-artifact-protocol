@@ -1,7 +1,5 @@
 # Cookbook: schema pinning
 
-> **Profile status:** used in practice
-
 > **Consumer ops guidance — not a new Core schema feature.**  
 > Keeps validators honest when upstream evolves.
 
@@ -26,7 +24,7 @@ Agents then “pass” maps that other clones reject — or the reverse.
 
 | Style | Example | Notes |
 |-------|---------|--------|
-| **Git tag** | `v0.2.1-prototype` | Preferred for humans; matches CHANGELOG language with `v` prefix on tags |
+| **Git tag** | `v0.3.0` | Preferred for humans; matches CHANGELOG language with `v` prefix on tags |
 | **Commit SHA** | full or abbreviated immutable SHA | Best when tags lag |
 | **Vendored file** | copy `schemas/map.schema.json` into consumer | Offline CI; bump deliberately |
 | **Contract sidecar** | e.g. `.aap/aap-contract.yaml` with `revision` + `sha256` | Optional; consumer convention |
@@ -34,7 +32,7 @@ Agents then “pass” maps that other clones reject — or the reverse.
 Conceptual pin (no fetch during normal sessions):
 
 ```bash
-# git clone --depth 1 --branch v0.2.1-prototype \
+# git clone --depth 1 --branch v0.3.0 \
 #   https://github.com/gitpash/agent-artifact-protocol.git /tmp/aap
 # cp /tmp/aap/schemas/map.schema.json path/to/consumer-tools/
 ```
@@ -43,7 +41,7 @@ One-line consumer note (example):
 
 ```text
 # .aap/VERSION  (or equivalent local note)
-v0.2.1-prototype
+v0.3.0
 https://github.com/gitpash/agent-artifact-protocol
 ```
 
@@ -53,14 +51,14 @@ https://github.com/gitpash/agent-artifact-protocol
 # Consumer-local — not required by Map v2 Core
 schema:
   name: map.schema.json
-  pin: v0.2.1-prototype      # or commit SHA
+  pin: v0.3.0      # or commit SHA
   # sha256: <hex of pinned bytes>
 source: https://github.com/gitpash/agent-artifact-protocol
 ```
 
 Upgrade **schema revision, lock/contract, validator, and compatibility fixtures together**. Partial upgrades are how tip-drift returns.
 
-## Dual gist vs in-repo honesty
+## Editor hint vs in-repo schema
 
 This seed’s minimal map template may carry a `yaml-language-server: $schema=…` comment pointing at a **revision-pinned** raw URL for editor UX. The **repository** also ships `schemas/map.schema.json`.
 
@@ -70,7 +68,7 @@ This seed’s minimal map template may carry a `yaml-language-server: $schema=�
 | Pinned remote URL in a comment | Editor convenience — **must** name an immutable revision, not tip |
 | Consumer contract file | Local lock for *their* validators |
 
-**MUST NOT** silently validate against Gist or GitHub **tip**. If Gist and git diverge, say so and pick one pin for automation until they match.
+**MUST NOT** silently validate against a mutable URL or GitHub **tip**. If the remote copy and the repository ever diverge, say so and pick one pin for automation until they match.
 
 Validation is **never** required for L0 orientation. Schema checks are for editors, CI, and conformance claims — not session start preload.
 

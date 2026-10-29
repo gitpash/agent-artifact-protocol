@@ -1,7 +1,5 @@
 # Cookbook: local bootstrap (optional profile)
 
-> **Profile status:** used in practice
-
 > **Optional profile — not required for Orientation conformance.**  
 > Keeps machine GPS and session procedure out of the committed Core map.
 
@@ -98,6 +96,5 @@ Before claiming done / ship / PR-ready, walk a small checklist (orient, evidence
 - [`done-bar.md`](./done-bar.md)  
 - [`schema-pinning.md`](./schema-pinning.md)  
 - [`hub-umbrella.md`](./hub-umbrella.md)  
-- [`what-not-to-copy.md`](./what-not-to-copy.md)  
 - [`brownfield-init.md`](./brownfield-init.md) — still ends at map-only experiment first  
  

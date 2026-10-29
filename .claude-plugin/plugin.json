@@ -1,0 +1,9 @@
+{
+  "name": "aap",
+  "version": "0.3.0",
+  "description": "The aap-map skill writes a minimal .aap/map.yaml for a repository and marks its guesses for human review.",
+  "author": { "name": "gitpash" },
+  "repository": "https://github.com/gitpash/agent-artifact-protocol",
+  "license": "MIT",
+  "keywords": ["aap", "repository-map", "agent-context", "skill"]
+}

@@ -1,7 +1,5 @@
 # Cookbook: done bar (optional profile)
 
-> **Profile status:** used in practice
-
 > **Optional profile — not required for Orientation conformance.**  
 > Core L0 remains: discoverable map only.
 
@@ -90,4 +88,3 @@ Harnesses MAY require walking the bar before “done.” That is **consumer/runt
 
 - [`stream-packs.md`](./stream-packs.md)  
 - [`local-bootstrap.md`](./local-bootstrap.md)  
-- [`what-not-to-copy.md`](./what-not-to-copy.md)  

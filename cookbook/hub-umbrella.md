@@ -1,7 +1,5 @@
 # Cookbook: hub umbrella (multi-repo shell)
 
-> **Profile status:** pending author
-
 > **Teaching pattern on Core maps.** Core already allows shell maps (`nodes` + child `map.path`). This page scales the idea. Not a new Core requirement.
 
 ## Problem

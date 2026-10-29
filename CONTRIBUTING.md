@@ -6,9 +6,9 @@ Thank you for helping keep the Core **small**.
 
 | Place | Form |
 |-------|------|
-| Documents / CHANGELOG | `0.2.1-prototype` (no `v`) |
-| Git tags | `v0.2.1-prototype` (with `v`) |
-| Prior Core intro label | `0.2.0-draft` / historical commits — Map v2 rules unchanged in `0.2.1-prototype` |
+| Documents / CHANGELOG | `0.3.0` (no `v`) |
+| Git tags | `v0.3.0` (with `v`) |
+| Earlier labels | `0.2.1-prototype`, `0.2.0-draft`; Map v2 rules are unchanged since `0.2.0-draft` |
 
 ## What belongs in Core vs elsewhere
 
@@ -22,7 +22,7 @@ Thank you for helping keep the Core **small**.
 | Deployment-defined mode labels | Universal role vocabulary |
 | Schema shape validation | Cross-file linters beyond seed |
 | | **Stream packs**, **accept / done bars**, **orientation cards**, **local dispatcher** templates |
-| | Hub-umbrella teaching, glass-box factory *pattern*, orchestrator-session *shape* |
+| | Hub-umbrella teaching |
 | | Schema-pinning ops notes, brownfield init prose |
 
 ### Profile PRs are not Core MUST
@@ -32,7 +32,6 @@ Pull requests that add or edit:
 - stream pack samples / templates  
 - accept-default / done-bar checklists  
 - thin orientation cards  
-- factory or multi-agent session **stories**  
 
 …are **profile / cookbook** changes. Reviewers **MUST NOT** treat them as new Orientation requirements or as justification to grow mandatory L0. Optional profiles stay optional even when examples look polished.
 

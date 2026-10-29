@@ -1,0 +1,77 @@
+# Agent Artifact Protocol (AAP)
+
+> AAP makes repository context addressable without requiring it to be loaded. It is a small filesystem convention: one checked-in map file (`.aap/map.yaml`) that tells an agent where things live and which neighboring repositories exist, validated by a JSON Schema. It is not a context engine, RAG, agent framework, dependency graph or authorization system.
+
+Version: 0.3.0 (experimental, pre-1.0). Pin the tag `v0.3.0`; do not read the default branch tip as authoritative.
+
+## If you are an agent working in a repository
+
+1. Look for the map in this order: `.aap/map.yaml`, `map.yaml`, `docs/map.yaml`.
+2. Read that one file. That is the whole orientation step (level L0). Do not open anything else yet.
+3. Pick one `layout` key (`code`, `tests`, `artifacts`, `scratch`, ...) or one `nodes` entry for the task, and open only that path (L1).
+4. Open a single durable artifact only if the task needs durable memory (L2). Use normal code tools for the rest (L3).
+5. A node with a `map` pointer is a hop you may take on purpose. Never open linked maps recursively "to be safe".
+6. Do not fetch this upstream repository or read SPEC.md at session start. The local map is the source of truth for the checkout.
+
+If there is no map and the user wants one, use the `aap-map` skill (see below) or copy `templates/minimal-map.yaml` to `.aap/map.yaml` and edit it. Never overwrite an existing map without explicit confirmation.
+
+## The map in one screen
+
+```yaml
+version: 2
+workspace: { id: my-app, description: What this checkout is }
+self: { id: my-app, kind: repository, path: . }
+layout:
+  code: src/
+  tests: tests/
+  artifacts: docs/artifacts/
+  scratch: docs/scratch/
+nodes: []
+```
+
+- `id` values are lowercase kebab-case and start with a letter.
+- `layout` maps intent to a path in this checkout. Paths are relative, never absolute, never contain `..`. Paths may be absent on disk; do not invent a directory tree to satisfy the map.
+- `nodes` are direct navigation hops to other repositories or products. They are not a dependency graph. Keep them few.
+- Machine-local checkout paths go in a gitignored `map.local.yaml` (`overlays`), not in the committed map.
+
+## The `access` rules (write fence)
+
+Every layout value is either a path string or `{ path, access?, description? }`.
+
+- A string means `{ path: <string>, access: read-write }`. A missing `access` means `read-write`.
+- `access` is `read-only` or `read-write`. Nothing else.
+- `read-only`: you may read it, you must not create or change durable content there.
+- When a layout key lists several paths, the durable write home is the first entry whose access is not `read-only`.
+- If a key has no writable entry, stop and ask. Do not invent a parallel root and do not write into a read-only one.
+- On a node, `access: read-only` means do not modify that repository from this workspace (typical for external products).
+- A node's `write: [...]` list is a role hint, not a permission. It never overrides `access`.
+- `overlays` only say where a node is checked out on this machine. They never grant write rights.
+- All of this is a coordination fence between agents and humans. Real enforcement is Git permissions, CODEOWNERS, protected branches and sandboxes.
+
+Until the user or runtime explicitly enables writes, prefer reading and orienting only.
+
+## Where to read next (only when needed)
+
+- Normative spec, short: https://github.com/gitpash/agent-artifact-protocol/blob/v0.3.0/SPEC.md
+- Map JSON Schema (draft-07): https://raw.githubusercontent.com/gitpash/agent-artifact-protocol/v0.3.0/schemas/map.schema.json
+- Starter map: https://raw.githubusercontent.com/gitpash/agent-artifact-protocol/v0.3.0/templates/minimal-map.yaml
+- Examples (single repo, multi-repo hub, resource refs): `examples/` in the same tag
+- Optional profiles (stream packs, done bar, hub umbrella, CI validation): `cookbook/README.md`. These are never part of the mandatory first read.
+- Validator for this repo: `pip install pyyaml jsonschema && python scripts/validate.py`
+
+## Creating or updating a map: the `aap-map` skill
+
+The folder `skills/aap-map/` is a portable agent skill (one SKILL.md). It looks at a codebase, writes a minimal map, and flags guesses for human review. It does not need any tools installed. Install commands are at the top of the README.
+
+## Rules of thumb
+
+- Keep the map sparse. If a map did not help on a real task, shrink it before adding anything.
+- Prefer omitting a layout key over pointing it at a path that does not exist.
+- A node needs one concrete reason to exist: you would plausibly open that repository during a normal change here. A mention in a README is not enough.
+- Schema-valid does not mean useful. A human should review nodes before the map is relied on.
+
+## Optional
+
+- Rationale: https://github.com/gitpash/agent-artifact-protocol/blob/v0.3.0/docs/motivation.md
+- Changelog: https://github.com/gitpash/agent-artifact-protocol/blob/v0.3.0/CHANGELOG.md
+- License: MIT

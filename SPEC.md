@@ -2,8 +2,7 @@
 
 **Name:** Agent Artifact Protocol (AAP)  
 **Kind:** filesystem convention + JSON Schema  
-**Version:** 0.2.1-prototype  
-**Status:** experimental Core (Map v2) + prototype docs/cookbook (profiles optional)
+**Version:** 0.3.0 (experimental, pre-1.0)
 
 AAP makes repository context addressable without requiring it to be loaded. It is a small, runtime-agnostic navigation convention for repositories and optional durable artifacts. It is not a context engine, agent framework, retrieval protocol, dependency graph, or authorization system.
 
@@ -155,3 +154,14 @@ python scripts/validate.py
 ```
 
 The validator checks schemas, v2 examples, resource-reference path safety, and invalid fixtures. Repository-specific policies—such as requiring external nodes to be read-only—belong in that repository's own validator or profile.
+
+## Conformance labels
+
+| Label | Means |
+|-------|-------|
+| **Orientation** | A discoverable sparse map; layout-based discovery is possible. Requires only the L0 read. |
+| **Artifact** | The envelope field set, claimed only when artifacts are addressable. |
+| **Topology** | Nodes are direct hops, and listed paths are meant to resolve in the checkout. |
+| **Disclosure profile** (optional) | Streams, accept bars or thin orientation cards. Not required for Orientation. |
+
+AAP is a convention with schemas, not a complete cross-file protocol suite.

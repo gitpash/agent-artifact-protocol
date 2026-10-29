@@ -13,7 +13,7 @@ Pin details and dual-source honesty: [`schema-pinning.md`](./schema-pinning.md).
 
 | Pin | Effect |
 |-----|--------|
-| **Git tag** (e.g. `v0.2.1-prototype`) | Human-readable; matches release notes |
+| **Git tag** (e.g. `v0.3.0`) | Human-readable; matches release notes |
 | **Commit SHA** | Immutable when tags lag or you need a one-off revision |
 | Floating `main` / branch tip | **Silent drift** — yesterday’s green job can fail (or worse, pass a map that other clones reject) without any intentional upgrade |
 | Mutable Gist / `raw/.../main/...` URL | Same problem: remote bytes change under the same URL |
@@ -51,7 +51,7 @@ Vendor-neutral shape — map the `run:` body onto GitHub Actions, GitLab CI, Bui
 # EXAMPLE — illustrative job fragment (any CI product)
 # Pin MUST be a tag or commit SHA, never a floating branch name alone.
 env:
-  AAP_PIN: v0.2.1-prototype   # or full commit SHA
+  AAP_PIN: v0.3.0   # or full commit SHA
 steps:
   - name: checkout-consumer
     run: # your normal workspace checkout
@@ -97,7 +97,7 @@ Notes:
 
 ## See also
 
-- [`schema-pinning.md`](./schema-pinning.md) — pin styles, contract sidecar, Gist vs in-repo  
+- [`schema-pinning.md`](./schema-pinning.md) — pin styles, contract sidecar, editor hint vs in-repo schema  
 - [`brownfield-init.md`](./brownfield-init.md) — pin during first map copy  
 - [`README.md`](../README.md) — `scripts/validate.py` one-liner for this seed  
 - [`CONTRIBUTING.md`](../CONTRIBUTING.md) — Core vs profile; keep L0 small  

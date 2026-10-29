@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://gist.githubusercontent.com/gitpash/928c100ebf269acf9db7c09a18ed4a68/raw/map.schema.json",
+  "$id": "https://raw.githubusercontent.com/gitpash/agent-artifact-protocol/v0.3.0/schemas/map.schema.json",
   "title": "AAP Map (workspace / self / nodes) — single convention",
-  "description": "Pilot map schema. Additive evolution preferred while adoption is near-zero. Layout paths use resourceRef (path + optional access) so write fences share the same permission class as nodes.",
+  "description": "AAP Map v2. Additive evolution preferred. Layout paths use resourceRef (path + optional access) so write fences share the same permission class as nodes.",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "workspace", "self", "nodes"],

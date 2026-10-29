@@ -1,0 +1,12 @@
+{
+  "name": "agent-artifact-protocol",
+  "description": "Skills for the Agent Artifact Protocol (AAP), a repository map for coding agents",
+  "owner": { "name": "gitpash" },
+  "plugins": [
+    {
+      "name": "aap",
+      "source": "./",
+      "description": "aap-map: write a minimal .aap/map.yaml for any repository, with uncertain parts marked for human review."
+    }
+  ]
+}

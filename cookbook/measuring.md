@@ -1,6 +1,6 @@
 # Measuring whether a map helps (method)
 
-**Status:** method profile — documents *how* to measure, not measured results.  
+This page documents *how* to measure, not measured results.  
 **Do not** paste invented before/after numbers into this file.
 
 This is an optional cookbook pattern. It is **not** Core MUST and not required for Orientation conformance.
@@ -11,7 +11,7 @@ This is an optional cookbook pattern. It is **not** Core MUST and not required f
 
 Check whether a **sparse local map** improves orientation on *your* real work — with an honest A/B, not a slogan.
 
-Related: root README “Experiment before you expand” and [`MOTIVATION.md`](../MOTIVATION.md).
+Related: [`docs/motivation.md`](../docs/motivation.md).
 
 ---
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- `scripts/aap_workspace.py`: `missing` (nodes without a checkout, with the `git clone` for `locator.repo`; clones only with `--clone`), `siblings` (git repos next to the hub that are not nodes) and `suggest` (prints a nodes skeleton; never writes). Cookbook: `workspace-tools.md`.
+- Cookbook `home-repo.md`: the hub as the agent's launch point, with auto-clone, worktree and child-map recipes.
+
+### Changed
+
+- README shortened to a one-screen pitch with a diagram; detail lives in the cookbook and `docs/`. The schema is unchanged.
+
 ## 0.3.0 — 2026-10-28
 
 First release with an agent entry point and an installable skill. The Map v2 schema and its semantics are unchanged from 0.2.0. The "-prototype" suffix is dropped from the version: the project is still experimental, and the README Status section says so in one place.

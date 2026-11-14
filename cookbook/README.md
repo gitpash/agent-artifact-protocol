@@ -6,6 +6,8 @@ Optional profiles and how-to pages. None of them is part of the mandatory first 
 |------|----------------|
 | [brownfield-init](./brownfield-init.md) | Add a map to an existing repository without touching its docs system |
 | [hub-umbrella](./hub-umbrella.md) | A hub map for several repositories, with nodes as navigation hops |
+| [home-repo](./home-repo.md) | The hub-as-launch-point idea: auto-clone, worktrees, child maps for many repos |
+| [workspace-tools](./workspace-tools.md) | Scripts that report missing checkouts and missing nodes |
 | [schema-pinning](./schema-pinning.md) | Pin the schema by tag or commit instead of following the branch tip |
 | [ci-validation](./ci-validation.md) | Check maps against the pinned schema in CI (optional) |
 | [measuring](./measuring.md) | How to run an honest A/B of map versus no map |

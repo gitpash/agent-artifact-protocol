@@ -33,9 +33,9 @@ Prints a `nodes:` block (id, `locator.repo` from `origin`, `access: read-only`, 
 
 ```bash
 python scripts/aap_workspace.py state    # per-node status, see node-state
-python scripts/aap_workspace.py doctor   # map schema (if jsonschema is installed) + missing + state
+python scripts/aap_workspace.py doctor   # map schema (if jsonschema is installed) + state, and a missing-checkouts report
 ```
 
-`doctor` is the one command to run before a session or in CI; add `alias aap='python scripts/aap_workspace.py'` if you want it shorter. It exits 1 on any problem.
+`doctor` is the one command to run before a session or in CI; add `alias aap='python scripts/aap_workspace.py'` if you want it shorter. It exits 1 on a schema or state problem. Missing checkouts are only reported (a fresh machine or a partial checkout is normal); use `missing --strict` to fail on them.
 
 See also: [`home-repo`](./home-repo.md), [`hub-umbrella`](./hub-umbrella.md), [`local-bootstrap`](./local-bootstrap.md).

@@ -5,7 +5,7 @@
   siblings  git repos next to the map's repo that are not in the map's nodes
   suggest   print a nodes skeleton for the git repos in a folder (never writes)
   state     per-node status from the file layout.state points to (node-state profile)
-  doctor    schema check of the map (if jsonschema is installed) + missing + state
+  doctor    schema check (if jsonschema is installed) + state; exit 1 on those; missing checkouts are only reported
 
 Needs only PyYAML (the same dependency as validate.py) and git.
 """
@@ -206,7 +206,7 @@ def cmd_state(args: argparse.Namespace) -> int:
             problems += 1
             print(f"NO STATE {node_id}")
             continue
-        status = row.get("status", "?")
+        status = str(row.get("status", "?"))
         if status not in ("active", "parked"):
             problems += 1
             status += " (expected active or parked)"
@@ -233,8 +233,8 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         print("schema: skipped (pip install jsonschema)")
         failed = False
     print("== missing checkouts")
-    ns = argparse.Namespace(map=str(map_path), clone=False, strict=True)
-    failed |= cmd_missing(ns) != 0
+    # Missing checkouts are reported, not failed: a fresh machine or a partial checkout is normal.
+    cmd_missing(argparse.Namespace(map=str(map_path), clone=False, strict=False))
     print("== state")
     failed |= cmd_state(argparse.Namespace(map=str(map_path), strict=True)) != 0
     return 1 if failed else 0

@@ -7,7 +7,7 @@ The hub is committed, the machine paths are not. On a fresh machine:
 3. Check, then clone what is missing:
 
 ```bash
-python scripts/aap_workspace.py doctor        # map schema, missing checkouts, node state
+python scripts/aap_workspace.py doctor        # map schema, node state, and a report of missing checkouts
 python scripts/aap_workspace.py missing --clone
 ```
 

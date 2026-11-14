@@ -1,6 +1,6 @@
 # Cookbook: home repo
 
-A "home repo" (the idea Matt Pocock describes in his *Home Repo* video) is one repository you always launch your agent from. It holds the routing table: which projects exist, what each is for, where to go for what. An AAP hub map is that routing table in machine-readable form: `nodes` are the rows, `layout` is the hub's own folders, `map.local.yaml` says where each row lives on this machine. The map says where things are; what the agent should *do* (the next three recipes) belongs in `AGENTS.md` or `CLAUDE.md`.
+A "home repo" (the idea Matt Pocock describes in his *Home Repo* video) is one repository you always launch your agent from. It holds the routing table: which projects exist, what each is for, where to go for what. An AAP hub map is that routing table in machine-readable form: `nodes` are the rows, `layout` is the hub's own folders, `map.local.yaml` says where each row lives on this machine. The map says where things are; what the agent should *do* (the next two recipes) belongs in `AGENTS.md` or `CLAUDE.md`.
 
 Worked example: [`examples/personal-hub/`](../examples/personal-hub/). Map shape: [`hub-umbrella`](./hub-umbrella.md). Checks: [`workspace-tools`](./workspace-tools.md). Status per node: [`node-state`](./node-state.md). Reuse: [`capability-index`](./capability-index.md).
 

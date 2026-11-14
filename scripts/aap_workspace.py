@@ -11,6 +11,7 @@ Needs only PyYAML (the same dependency as validate.py) and git.
 """
 from __future__ import annotations
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -22,8 +23,21 @@ except ImportError:
 
 
 def load_yaml(path: Path) -> dict:
-    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    except (yaml.YAMLError, OSError, UnicodeDecodeError) as error:
+        sys.exit(f"ERROR: cannot read {path}: {error}")
     return data if isinstance(data, dict) else {}
+
+
+def get_nodes(data: dict) -> list[dict]:
+    """Node objects that have a string id; anything else is skipped (the schema check reports it)."""
+    nodes = data.get("nodes")
+    return [n for n in nodes if isinstance(n, dict) and isinstance(n.get("id"), str)] if isinstance(nodes, list) else []
+
+
+def as_dict(value: object) -> dict:
+    return value if isinstance(value, dict) else {}
 
 
 def find_map(start: Path) -> Path:
@@ -44,11 +58,11 @@ def overlay_paths(map_path: Path) -> dict[str, str]:
     found: dict[str, str] = {}
     sources = [load_yaml(map_path), *(load_yaml(p) for p in (map_path.with_name("map.local.yaml"),) if p.is_file())]
     for data in sources:  # the local file comes last and wins
-        overlays = data.get("overlays") or {}
-        for node_id, entry in (overlays.get("nodes") or {}).items():
+        overlays = as_dict(data.get("overlays"))
+        for node_id, entry in as_dict(overlays.get("nodes")).items():
             if isinstance(entry, dict) and entry.get("path"):
                 found[node_id] = entry["path"]
-        for node_id, path in (overlays.get("local_paths") or {}).items():
+        for node_id, path in as_dict(overlays.get("local_paths")).items():
             if isinstance(path, str):
                 found[node_id] = path
     return found
@@ -56,13 +70,15 @@ def overlay_paths(map_path: Path) -> dict[str, str]:
 
 def resolve(node: dict, overlays: dict[str, str], repo_root: Path) -> Path | None:
     raw = overlays.get(node["id"]) or node.get("path")
-    if not raw:
+    if not raw or not isinstance(raw, str):
         return None
     path = Path(raw).expanduser()
     return (path if path.is_absolute() else repo_root / path).resolve()
 
 
 def clone_url(repo: str) -> str:
+    if not isinstance(repo, str) or repo.startswith("-") or any(c.isspace() for c in repo):
+        sys.exit(f"ERROR: refusing odd locator.repo {repo!r}")
     return repo if ("://" in repo or "@" in repo) else f"https://github.com/{repo}.git"
 
 
@@ -81,6 +97,8 @@ def repo_slug(remote: str | None) -> str | None:
 
 
 def git_repos(root: Path) -> list[Path]:
+    if not root.is_dir():
+        sys.exit(f"ERROR: not a folder: {root}")
     return sorted(p for p in root.iterdir() if p.is_dir() and (p / ".git").exists())
 
 
@@ -89,9 +107,9 @@ def cmd_missing(args: argparse.Namespace) -> int:
     repo_root = root_of(map_path)
     overlays = overlay_paths(map_path)
     missing = 0
-    for node in load_yaml(map_path).get("nodes") or []:
+    for node in get_nodes(load_yaml(map_path)):
         path = resolve(node, overlays, repo_root)
-        repo = (node.get("locator") or {}).get("repo")
+        repo = as_dict(node.get("locator")).get("repo")
         if path and path.exists():
             print(f"ok       {node['id']}: {path}")
             continue
@@ -108,7 +126,7 @@ def cmd_missing(args: argparse.Namespace) -> int:
         print(f"         git clone {clone_url(repo)} {path}")
         if args.clone:
             path.parent.mkdir(parents=True, exist_ok=True)
-            subprocess.run(["git", "clone", clone_url(repo), str(path)], check=False)
+            subprocess.run(["git", "clone", "--", clone_url(repo), str(path)], check=False)
     print(f"{missing} missing")
     return 1 if (missing and args.strict) else 0
 
@@ -121,11 +139,11 @@ def cmd_siblings(args: argparse.Namespace) -> int:
     overlays = overlay_paths(map_path)
     known_paths = {repo_root}
     known_repos: set[str] = set()
-    for node in data.get("nodes") or []:
+    for node in get_nodes(data):
         path = resolve(node, overlays, repo_root)
         if path:
             known_paths.add(path)
-        repo = (node.get("locator") or {}).get("repo")
+        repo = as_dict(node.get("locator")).get("repo")
         if repo:
             known_repos.add(repo_slug(repo) or repo)
     extra = 0
@@ -159,24 +177,28 @@ def cmd_suggest(args: argparse.Namespace) -> int:
     print("overlays:\n  nodes:")
     for repo in git_repos(root):
         node_id = "".join(c if c.isalnum() else "-" for c in repo.name.lower()).strip("-")
-        print(f"    {node_id}: {{ path: {repo} }}")
+        print(f"    {node_id}: {{ path: {json.dumps(str(repo))} }}")
     return 0
 
 
 def cmd_state(args: argparse.Namespace) -> int:
     map_path = Path(args.map).resolve() if args.map else find_map(Path.cwd())
     data = load_yaml(map_path)
-    ref = (data.get("layout") or {}).get("state")
+    ref = as_dict(data.get("layout")).get("state")
     ref = ref.get("path") if isinstance(ref, dict) else ref
     if not isinstance(ref, str):
         print("no layout.state in the map; nothing to report (node-state profile not used)")
         return 0
+    if ref.startswith("/") or ".." in Path(ref).parts:
+        print(f"PROBLEM  layout.state must be a relative path without '..': {ref}")
+        return 1
     state_file = root_of(map_path) / ref
     if not state_file.is_file():
         print(f"PROBLEM  layout.state points to {ref}, which does not exist")
         return 1
-    rows = {r.get("id"): r for r in (load_yaml(state_file).get("projects") or []) if isinstance(r, dict)}
-    node_ids = [n["id"] for n in data.get("nodes") or []]
+    projects = load_yaml(state_file).get("projects")
+    rows = {r["id"]: r for r in (projects if isinstance(projects, list) else []) if isinstance(r, dict) and isinstance(r.get("id"), str)}
+    node_ids = [n["id"] for n in get_nodes(data)]
     problems = 0
     for node_id in node_ids:
         row = rows.get(node_id)
@@ -203,7 +225,6 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     print(f"== map: {map_path}")
     schema = Path(__file__).resolve().parents[1] / "schemas" / "map.schema.json"
     try:
-        import json
         import jsonschema  # type: ignore
         errors = list(jsonschema.Draft7Validator(json.loads(schema.read_text())).iter_errors(load_yaml(map_path)))
         print("schema: ok" if not errors else "schema: FAILED\n  " + "\n  ".join(e.message for e in errors))

@@ -1,0 +1,18 @@
+# node-state profile: one row per node id. Keep it short: status, next step, resume condition.
+projects:
+  - id: web-app
+    status: active
+    next: Ship the login rework behind a flag.
+    resume_when: ""
+  - id: sensor-firmware
+    status: active
+    next: Re-run the sampling-rate test after the board arrives.
+    resume_when: ""
+  - id: research-notes
+    status: parked
+    next: Write up the second experiment.
+    resume_when: web-app login rework is shipped
+  - id: scratch-tools
+    status: parked
+    next: Nothing planned.
+    resume_when: a task needs a one-off helper script

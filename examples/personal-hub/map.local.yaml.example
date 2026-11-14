@@ -1,0 +1,7 @@
+# Copy to .aap/map.local.yaml (gitignored). Navigation only, never grants write access.
+overlays:
+  nodes:
+    web-app: { path: ~/code/web-app }
+    sensor-firmware: { path: ~/code/sensor-firmware }
+    research-notes: { path: ~/code/research-notes }
+    scratch-tools: { path: ~/code/scratch-tools }

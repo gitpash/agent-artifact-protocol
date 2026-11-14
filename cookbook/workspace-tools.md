@@ -1,6 +1,6 @@
 # Cookbook: workspace tools
 
-Three small checks for a hub map, in [`scripts/aap_workspace.py`](../scripts/aap_workspace.py). They need Python, PyYAML (already needed by `validate.py`) and `git`. They read the map and `.aap/map.local.yaml` and change nothing, except `--clone`, which you must pass yourself. Nothing is copied between files: the map stays the single source.
+Small checks for a hub map, in [`scripts/aap_workspace.py`](../scripts/aap_workspace.py). They need Python, PyYAML (already needed by `validate.py`) and `git`. They read the map and `.aap/map.local.yaml` and change nothing, except `--clone`, which you must pass yourself. Nothing is copied between files: the map stays the single source.
 
 Run from inside the hub; the map is found by searching upward, or pass `--map PATH`.
 
@@ -28,5 +28,14 @@ python scripts/aap_workspace.py suggest ~/code
 ```
 
 Prints a `nodes:` block (id, `locator.repo` from `origin`, `access: read-only`, a `# REVIEW` description) and the matching `overlays` block for `map.local.yaml`. Paste what you want; the script never writes or overwrites a map. Descriptions are yours to write: a node is worth having only if you can say in one line when to open it.
+
+## State and doctor
+
+```bash
+python scripts/aap_workspace.py state    # per-node status, see node-state
+python scripts/aap_workspace.py doctor   # map schema (if jsonschema is installed) + missing + state
+```
+
+`doctor` is the one command to run before a session or in CI; add `alias aap='python scripts/aap_workspace.py'` if you want it shorter. It exits 1 on any problem.
 
 See also: [`home-repo`](./home-repo.md), [`hub-umbrella`](./hub-umbrella.md), [`local-bootstrap`](./local-bootstrap.md).

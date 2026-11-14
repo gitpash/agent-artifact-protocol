@@ -4,6 +4,8 @@
   missing   nodes whose checkout is absent, with the `git clone` for locator.repo
   siblings  git repos next to the map's repo that are not in the map's nodes
   suggest   print a nodes skeleton for the git repos in a folder (never writes)
+  state     per-node status from the file layout.state points to (node-state profile)
+  doctor    schema check of the map (if jsonschema is installed) + missing + state
 
 Needs only PyYAML (the same dependency as validate.py) and git.
 """
@@ -30,6 +32,11 @@ def find_map(start: Path) -> Path:
         if candidate.is_file():
             return candidate
     sys.exit("ERROR: no .aap/map.yaml found; pass --map")
+
+
+def root_of(map_path: Path) -> Path:
+    """Repo root: parent of .aap/, or the map's own folder for example maps."""
+    return map_path.parent.parent if map_path.parent.name == ".aap" else map_path.parent
 
 
 def overlay_paths(map_path: Path) -> dict[str, str]:
@@ -79,7 +86,7 @@ def git_repos(root: Path) -> list[Path]:
 
 def cmd_missing(args: argparse.Namespace) -> int:
     map_path = Path(args.map).resolve() if args.map else find_map(Path.cwd())
-    repo_root = map_path.parent.parent
+    repo_root = root_of(map_path)
     overlays = overlay_paths(map_path)
     missing = 0
     for node in load_yaml(map_path).get("nodes") or []:
@@ -108,7 +115,7 @@ def cmd_missing(args: argparse.Namespace) -> int:
 
 def cmd_siblings(args: argparse.Namespace) -> int:
     map_path = Path(args.map).resolve() if args.map else find_map(Path.cwd())
-    repo_root = map_path.parent.parent
+    repo_root = root_of(map_path)
     root = Path(args.root).expanduser().resolve() if args.root else repo_root.parent
     data = load_yaml(map_path)
     overlays = overlay_paths(map_path)
@@ -156,6 +163,62 @@ def cmd_suggest(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_state(args: argparse.Namespace) -> int:
+    map_path = Path(args.map).resolve() if args.map else find_map(Path.cwd())
+    data = load_yaml(map_path)
+    ref = (data.get("layout") or {}).get("state")
+    ref = ref.get("path") if isinstance(ref, dict) else ref
+    if not isinstance(ref, str):
+        print("no layout.state in the map; nothing to report (node-state profile not used)")
+        return 0
+    state_file = root_of(map_path) / ref
+    if not state_file.is_file():
+        print(f"PROBLEM  layout.state points to {ref}, which does not exist")
+        return 1
+    rows = {r.get("id"): r for r in (load_yaml(state_file).get("projects") or []) if isinstance(r, dict)}
+    node_ids = [n["id"] for n in data.get("nodes") or []]
+    problems = 0
+    for node_id in node_ids:
+        row = rows.get(node_id)
+        if not row:
+            problems += 1
+            print(f"NO STATE {node_id}")
+            continue
+        status = row.get("status", "?")
+        if status not in ("active", "parked"):
+            problems += 1
+            status += " (expected active or parked)"
+        line = f"{status:7}  {node_id}: {row.get('next', '')}"
+        if row.get("status") == "parked" and row.get("resume_when"):
+            line += f"  [resume when: {row['resume_when']}]"
+        print(line)
+    for unknown in sorted(set(rows) - set(node_ids), key=str):
+        problems += 1
+        print(f"UNKNOWN  {unknown}: in {ref} but not a node")
+    return 1 if (problems and args.strict) else 0
+
+
+def cmd_doctor(args: argparse.Namespace) -> int:
+    map_path = Path(args.map).resolve() if args.map else find_map(Path.cwd())
+    print(f"== map: {map_path}")
+    schema = Path(__file__).resolve().parents[1] / "schemas" / "map.schema.json"
+    try:
+        import json
+        import jsonschema  # type: ignore
+        errors = list(jsonschema.Draft7Validator(json.loads(schema.read_text())).iter_errors(load_yaml(map_path)))
+        print("schema: ok" if not errors else "schema: FAILED\n  " + "\n  ".join(e.message for e in errors))
+        failed = bool(errors)
+    except ImportError:
+        print("schema: skipped (pip install jsonschema)")
+        failed = False
+    print("== missing checkouts")
+    ns = argparse.Namespace(map=str(map_path), clone=False, strict=True)
+    failed |= cmd_missing(ns) != 0
+    print("== state")
+    failed |= cmd_state(argparse.Namespace(map=str(map_path), strict=True)) != 0
+    return 1 if failed else 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -167,6 +230,11 @@ def main() -> int:
             p.add_argument("--clone", action="store_true", help="actually run git clone for missing nodes")
         else:
             p.add_argument("--root", help="folder to scan (default: parent of the map's repository)")
+        p.set_defaults(func=func)
+    for name, func in (("state", cmd_state), ("doctor", cmd_doctor)):
+        p = sub.add_parser(name)
+        p.add_argument("--map", help="path to .aap/map.yaml (default: search upward from cwd)")
+        p.add_argument("--strict", action="store_true", help="exit 1 when something is reported")
         p.set_defaults(func=func)
     p = sub.add_parser("suggest")
     p.add_argument("root", help="folder that holds the repositories")

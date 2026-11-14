@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=../../schemas/map.schema.json
+# Synthetic personal hub: the repository you always launch the agent from.
+# Topology lives here; status lives in projects.yaml (node-state profile);
+# machine paths live in the gitignored .aap/map.local.yaml (see map.local.yaml.example).
+version: 2
+workspace:
+  id: personal-hub
+  description: "Thin hub over my own projects: registry, inbox, reuse index."
+self:
+  id: personal-hub
+  kind: repository
+  path: .
+layout:
+  state: projects.yaml
+  reuse: reuse.md
+  daily: daily/
+nodes:
+  - id: web-app
+    kind: repository
+    description: "Customer-facing web app; open for UI and API client work."
+    locator: { repo: example/web-app }
+    access: read-only
+  - id: sensor-firmware
+    kind: repository
+    description: "Firmware for the motion sensor; open for hardware and sampling questions."
+    locator: { repo: example/sensor-firmware }
+    access: read-only
+  - id: research-notes
+    kind: repository
+    description: "Experiments and write-ups; status in its docs/STATE.md."
+    locator: { repo: example/research-notes }
+    access: read-only
+  - id: scratch-tools
+    kind: repository
+    description: "Local-only helper scripts; no remote."
+    access: read-only
+profiles:
+  enabled:
+    - node-state

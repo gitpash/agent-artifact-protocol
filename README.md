@@ -59,7 +59,7 @@ Not a retrieval engine, not an agent framework, not a security boundary (`access
 ## Going further
 
 - [`SPEC.md`](./SPEC.md) and [`schemas/`](./schemas/): the normative spec and JSON Schema.
-- [`cookbook/`](./cookbook/): optional recipes. For a hub of many repos: [home repo](./cookbook/home-repo.md) and [workspace tools](./cookbook/workspace-tools.md) (find missing nodes and checkouts).
+- [`cookbook/`](./cookbook/): optional recipes. For a hub of many repos: [home repo](./cookbook/home-repo.md), [workspace tools](./cookbook/workspace-tools.md) and [node state](./cookbook/node-state.md). Worked example: [`examples/personal-hub/`](./examples/personal-hub/).
 - [`docs/motivation.md`](./docs/motivation.md), [`docs/skill-tests.md`](./docs/skill-tests.md), [`CONTRIBUTING.md`](./CONTRIBUTING.md), [`CHANGELOG.md`](./CHANGELOG.md).
 - This repo's own map: [`.aap/map.yaml`](./.aap/map.yaml). Optional CI check: [`cookbook/ci-validation.md`](./cookbook/ci-validation.md).
 

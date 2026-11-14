@@ -8,6 +8,9 @@ Optional profiles and how-to pages. None of them is part of the mandatory first 
 | [hub-umbrella](./hub-umbrella.md) | A hub map for several repositories, with nodes as navigation hops |
 | [home-repo](./home-repo.md) | The hub-as-launch-point idea: auto-clone, worktrees, child maps for many repos |
 | [workspace-tools](./workspace-tools.md) | Scripts that report missing checkouts and missing nodes |
+| [node-state](./node-state.md) | Mark nodes active or parked with a next step, without a schema change |
+| [capability-index](./capability-index.md) | A capability -> project table for "I already built this" |
+| [new-machine](./new-machine.md) | Rebuild a hub's checkouts on a fresh machine |
 | [schema-pinning](./schema-pinning.md) | Pin the schema by tag or commit instead of following the branch tip |
 | [ci-validation](./ci-validation.md) | Check maps against the pinned schema in CI (optional) |
 | [measuring](./measuring.md) | How to run an honest A/B of map versus no map |
